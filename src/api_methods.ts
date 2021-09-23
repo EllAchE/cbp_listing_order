@@ -11,6 +11,11 @@ const cbp = require('coinbase-pro');
 // checks should be via cron or similar 
 
 
+// Order placing should go this way:
+// Coinbase pro listing identified, nothing should be done
+// coinbase all listing ided, should place order. Can check if it makes sense to do things early
+
+
 const key = 'your_api_key';
 const secret = 'your_b64_secret';
 const passphrase = 'your_passphrase';
@@ -56,7 +61,7 @@ const createMarketSellOrder = (price, amount, tradingPair) => {
     };
 }
 
-// Example from site
+// Example from site for buy & sell
 // // Buy 1 BTC @ 100 USD
 // const buyParams = {
 //     price: '100.00', // USD
@@ -72,3 +77,22 @@ const createMarketSellOrder = (price, amount, tradingPair) => {
 //     product_id: 'BTC-USD',
 //   };
 //   authedClient.sell(sellParams, callback);
+
+
+// example for close pos
+// const params = {
+//     repay_only: false,
+//   };
+//   authedClient.closePosition(params, callback);
+
+
+// Getting prices 
+// https://docs.pro.coinbase.com/#get-product-order-book
+// Get the order book at the default level of detail.
+// publicClient.getProductOrderBook('BTC-USD', callback);
+
+// // Get the order book at a specific level of detail.
+// publicClient.getProductOrderBook('LTC-USD', { level: 3 }, callback);
+
+// Get Products allows you to see valid pairs; i.e. may not have USD support (but generally should)
+// https://docs.pro.coinbase.com/#products
