@@ -94,15 +94,48 @@ export const placeOrder = async (isBuy: boolean, isLimit: boolean, price: number
 // Get the order book at the default level of detail.
 // publicClient.getProductOrderBook('BTC-USD', callback);
 
-export const getCurrentPrice = async (tradingPair: string, depth: number) => {
+export const getBestCurrentPrice = async (tradingPair: string, depth: number): Promise<number> => {
     const orderBook = await authedClient.getProductOrderBook(tradingPair, { level: depth })
-    .then()
-    .catch(err => {
-        console.error(err)
-    })
+        .then()
+        .catch(err => {
+            console.error(err)
+        })
+    //const bestPrice = orderBook["asks"][1][0]
+    // more complicated decisions can be made if the order book depth is also used
 
-    
+    return orderBook["asks"][1][0];
 }
+
+// need to determine which trading pairs are 
+export const getTradingPairs = async (baseCoin: string, getBuyPairs: boolean): Promise<string[]> => {
+    // getProducts returns the full list of trading pairs
+    const allPairs = authedClient.getProducts()
+        .then()
+        .catch(err => {
+            console.error(err)
+        });
+
+    //const buyPairs = allPairs.filter((pair) => pair["quote_currency"] == baseCoin)
+    //const sellPairs = allPairs.filter((pair) => pair["base_currency"] == baseCoin)
+
+    if (getBuyPairs) return allPairs.filter((pair) => pair["quote_currency"] == baseCoin);
+
+    return allPairs.filter((pair) => pair["base_currency"] == baseCoin);
+}
+
+/*
+    order book calls return at depth 1
+    {
+    "sequence": "3",
+    "bids": [
+        [ price, size, num-orders ],
+    ],
+    "asks": [
+        [ price, size, num-orders ],
+    ]
+}
+
+*/
 
 // // Get the order book at a specific level of detail.
 // publicClient.getProductOrderBook('LTC-USD', { level: 3 }, callback);
