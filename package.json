@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/EllAchE/cbp_listing_order#readme",
   "dependencies": {
-    "coinbase-pro": "^0.9.0"
+    "coinbase-pro": "^0.9.0",
+    "cron": "^1.8.2",
+    "rss-parser": "^3.12.0"
   }
 }
