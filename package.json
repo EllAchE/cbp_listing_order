@@ -1,0 +1,22 @@
+{
+  "name": "cbp_listing_order",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EllAchE/cbp_listing_order.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EllAchE/cbp_listing_order/issues"
+  },
+  "homepage": "https://github.com/EllAchE/cbp_listing_order#readme",
+  "dependencies": {
+    "coinbase-pro": "^0.9.0"
+  }
+}
