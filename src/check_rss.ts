@@ -11,6 +11,6 @@ const cronString = `0 * 23,7-23 * * *`;
 got('https://blog.coinbase.com/feed').then(response => {
     const parser = new rss();
     const content = parser.parseString(response.body)
-    const firstItem = content.items[0]['title']; // other option is content:encoded
-    const hash = cryp.createHash(`md5`).update(firstItem).digest(`hex`); //Get content of site
+    const title = content.items[0]['title']; // other option is content:encoded
+    const hash = cryp.createHash(`md5`).update(title).digest(`hex`); //Get content of site
 })

@@ -27,7 +27,9 @@ const authedClient = new cbp.AuthenticatedClient(
 );
 
 // https://docs.pro.coinbase.com/#place-a-new-order
-const createLimitBuyOrder = (price, amount, tradingPair) => {
+
+// same params for buy and sell
+const createLimitOrder = (price: number, amount: number, tradingPair: string) => {
     return {
         price: price, // USD
         size: amount, // BTC
@@ -35,26 +37,31 @@ const createLimitBuyOrder = (price, amount, tradingPair) => {
     };
 }
 
-const createLimitSellOrder = (price, amount, tradingPair) => {
-    return {
-        price: price, // USD
-        size: amount, // BTC
-        product_id: tradingPair, // first item is what's being bought, second item is what's being spent
-    };
-}
-
-const createMarketBuyOrder = (price, amount, tradingPair) => {
+// same params for buy and sell
+const createMarketOrder = (amount, tradingPair) => {
     return {
         size: amount, // BTC
         product_id: tradingPair, // first item is what's being bought, second item is what's being spent
     };
 }
 
-const createMarketSellOrder = (price, amount, tradingPair) => {
-    return {
-        size: amount, // BTC
-        product_id: tradingPair, // first item is what's being bought, second item is what's being spent
-    };
+export const placeOrder = async (isBuy: boolean, isLimit: boolean, price: number, amount: number, tradingPair: string) => {
+    if (isBuy && isLimit) {
+        const orderParams = createLimitOrder(price, amount, tradingPair)
+        //authedClient.buy(orderParams) // returns a promise
+    }
+    else if (isBuy && !isLimit) {
+        const orderParams = createMarketOrder(amount, tradingPair)
+        //authedClient.buy(orderParams) // returns a promise
+    }
+    else if (!isBuy && isLimit) {
+        const orderParams = createLimitOrder(price, amount, tradingPair)
+        //authedClient.sell(orderParams) // returns a promise
+    }
+    else if (!isBuy && !isLimit) {
+        const orderParams = createMarketOrder(amount, tradingPair)
+        //authedClient.sell(orderParams) // returns a promise
+    }
 }
 
 // Example from site for buy & sell
@@ -86,6 +93,16 @@ const createMarketSellOrder = (price, amount, tradingPair) => {
 // https://docs.pro.coinbase.com/#get-product-order-book
 // Get the order book at the default level of detail.
 // publicClient.getProductOrderBook('BTC-USD', callback);
+
+export const getCurrentPrice = async (tradingPair: string, depth: number) => {
+    const orderBook = await authedClient.getProductOrderBook(tradingPair, { level: depth })
+    .then()
+    .catch(err => {
+        console.error(err)
+    })
+
+    
+}
 
 // // Get the order book at a specific level of detail.
 // publicClient.getProductOrderBook('LTC-USD', { level: 3 }, callback);
