@@ -25,4 +25,50 @@ const authedClient = new cbp.AuthenticatedClient(
     apiURI
 );
 
+// https://docs.pro.coinbase.com/#place-a-new-order
+const createLimitBuyOrder = (price, amount, tradingPair) => {
+    return {
+        price: price, // USD
+        size: amount, // BTC
+        product_id: tradingPair, // first item is what's being bought, second item is what's being spent
+    };
+}
 
+const createLimitSellOrder = (price, amount, tradingPair) => {
+    return {
+        price: price, // USD
+        size: amount, // BTC
+        product_id: tradingPair, // first item is what's being bought, second item is what's being spent
+    };
+}
+
+const createMarketBuyOrder = (price, amount, tradingPair) => {
+    return {
+        size: amount, // BTC
+        product_id: tradingPair, // first item is what's being bought, second item is what's being spent
+    };
+}
+
+const createMarketSellOrder = (price, amount, tradingPair) => {
+    return {
+        size: amount, // BTC
+        product_id: tradingPair, // first item is what's being bought, second item is what's being spent
+    };
+}
+
+// Example from site
+// // Buy 1 BTC @ 100 USD
+// const buyParams = {
+//     price: '100.00', // USD
+//     size: '1', // BTC
+//     product_id: 'BTC-USD',
+//   };
+//   authedClient.buy(buyParams, callback);
+
+//   // Sell 1 BTC @ 110 USD
+//   const sellParams = {
+//     price: '110.00', // USD
+//     size: '1', // BTC
+//     product_id: 'BTC-USD',
+//   };
+//   authedClient.sell(sellParams, callback);
