@@ -16,17 +16,13 @@ const cbp = require('coinbase-pro');
 // coinbase all listing ided, should place order. Can check if it makes sense to do things early
 
 
-const key = 'your_api_key';
-const secret = 'your_b64_secret';
-const passphrase = 'your_passphrase';
-
 const apiURI = 'https://api.pro.coinbase.com';
 const sandboxURI = 'https://api-public.sandbox.pro.coinbase.com';
 
 const authedClient = new cbp.AuthenticatedClient(
-    key,
-    secret,
-    passphrase,
+    process.env.key,
+    process.env.secret,
+    process.env.passphrase,
     apiURI
 );
 
