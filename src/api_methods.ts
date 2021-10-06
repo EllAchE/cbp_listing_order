@@ -34,19 +34,19 @@ const createMarketOrder = (amount: number, tradingPair: string): MarketOrder => 
 export const placeOrder = async (isBuy: boolean, isLimit: boolean, price: number, amount: number, tradingPair: string): Promise<void> => {
     if (isBuy && isLimit) {
         const orderParams = createLimitOrder(price, amount, tradingPair)
-        //authedClient.buy(orderParams) // returns a promise
+        authedClient.buy(orderParams) // returns a promise
     }
     else if (isBuy && !isLimit) {
         const orderParams = createMarketOrder(amount, tradingPair)
-        //authedClient.buy(orderParams) // returns a promise
+        authedClient.buy(orderParams) // returns a promise
     }
     else if (!isBuy && isLimit) {
         const orderParams = createLimitOrder(price, amount, tradingPair)
-        //authedClient.sell(orderParams) // returns a promise
+        authedClient.sell(orderParams) // returns a promise
     }
     else if (!isBuy && !isLimit) {
         const orderParams = createMarketOrder(amount, tradingPair)
-        //authedClient.sell(orderParams) // returns a promise
+        authedClient.sell(orderParams) // returns a promise
     }
 }
 

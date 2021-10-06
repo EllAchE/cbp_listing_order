@@ -26,3 +26,9 @@ export interface TradingPair {
 export interface OrderBook {
     any
 }
+
+export interface LoggingResponse {
+    successfulOrder: boolean
+    title: string
+    error: string
+}
