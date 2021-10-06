@@ -1,15 +1,23 @@
-export interface MarketOrder {
-    size: number
-    product_id: string
-}
+import { OrderParams, LimitOrder } from "coinbase-pro";
 
-export interface LimitOrder extends MarketOrder {
-    price: number
-}
+// export interface MarketOrder {
+//     //side: string
+//     size: number
+//     product_id: string
+// }
+
+// export interface LimitOrder extends MarketOrder {
+//     price: number
+// }
 
 export enum ResponseCode {
     SUCCESS = "200 OK",
     FAILURE = "500 ERROR"
+}
+
+export enum BuyOrSellString {
+    Buy = "buy",
+    Sell = "sell"
 }
 
 export interface BuySellPairs {
