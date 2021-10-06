@@ -1,20 +1,10 @@
 const cbp = require('coinbase-pro');
+import { BuySellPairs, LimitOrder, MarketOrder, ResponseCode, OrderBook } from "./typing";
 
-// client sdk https://github.com/coinbase/coinbase-pro-node
-// Listing data https://docs.google.com/spreadsheets/d/1y0SE1DtbaUltUHtGBzBgz9BXgzKGvk5SF1xjjK52grw/edit#gid=0
-
-
-// fetch the price of asset for cases where placing limit order
-// support market order
-// send telegram alert when order is placed (optional)
-// send alert when order is complete (optional but impt imo)
-// checks should be via cron or similar 
-
-
-// Order placing should go this way:
-// Coinbase pro listing identified, nothing should be done
-// coinbase all listing ided, should place order. Can check if it makes sense to do things early
-
+// Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
+// For now will be assuming USD but could convert to prioritize different pairs
+// const preferredTradingPairs = ["USD", "BTC"]
+const preferredTradingPair = "USD"
 
 const apiURI = 'https://api.pro.coinbase.com';
 const sandboxURI = 'https://api-public.sandbox.pro.coinbase.com';
@@ -26,10 +16,7 @@ const authedClient = new cbp.AuthenticatedClient(
     apiURI
 );
 
-// https://docs.pro.coinbase.com/#place-a-new-order
-
-// same params for buy and sell
-const createLimitOrder = (price: number, amount: number, tradingPair: string) => {
+const createLimitOrder = (price: number, amount: number, tradingPair: string): LimitOrder => { // same params for buy and sell
     return {
         price: price, // USD
         size: amount, // BTC
@@ -37,15 +24,14 @@ const createLimitOrder = (price: number, amount: number, tradingPair: string) =>
     };
 }
 
-// same params for buy and sell
-const createMarketOrder = (amount, tradingPair) => {
+const createMarketOrder = (amount: number, tradingPair: string): MarketOrder => { // same params for buy and sell
     return {
         size: amount, // BTC
         product_id: tradingPair, // first item is what's being bought, second item is what's being spent
     };
 }
 
-export const placeOrder = async (isBuy: boolean, isLimit: boolean, price: number, amount: number, tradingPair: string) => {
+export const placeOrder = async (isBuy: boolean, isLimit: boolean, price: number, amount: number, tradingPair: string): Promise<void> => {
     if (isBuy && isLimit) {
         const orderParams = createLimitOrder(price, amount, tradingPair)
         //authedClient.buy(orderParams) // returns a promise
@@ -63,6 +49,89 @@ export const placeOrder = async (isBuy: boolean, isLimit: boolean, price: number
         //authedClient.sell(orderParams) // returns a promise
     }
 }
+
+// trading pair is a string like BTC-USD. Depth caps at 3 (unaggrated orders). 2 is aggregated, 1 is just best
+export const getOrderBook = async (tradingPair: string, depth: number): Promise<OrderBook> => {
+    return await authedClient.getProductOrderBook(tradingPair, { level: depth })
+        .catch(err => {
+            console.error(err)
+        })
+}
+
+export const getBestCurrentPriceFromOrderBook = async (orderBook: OrderBook): Promise<number> => {
+    // const bestPrice = orderBook["asks"][1][0]
+    // more complicated decisions can be made if the order book depth is also used
+
+    return orderBook["asks"][1][0];
+}
+
+export const getCurrentPriceWithDepthOf20k = async (orderBook: OrderBook): Promise<number> => {
+    const orderBookVolume = 0;
+    while (orderBookVolume < 20000)
+        return orderBook["asks"][1][0];
+}
+
+// need to determine which trading pairs are available
+export const getTradingPairs = async (baseCoin: string, tradingPair: string): Promise<BuySellPairs> => {
+    // getProducts returns the full list of trading pairs
+    const allPairs = await authedClient.getProducts()
+        .catch(err => {
+            console.error(err)
+        });
+
+    let sellPairs = allPairs.filter((pair) => pair["base_currency"] == baseCoin && pair["quote_currency"] == tradingPair);
+    let buyPairs = allPairs.filter((pair) => pair["quote_currency"] == baseCoin && pair["base_currency"] == tradingPair);
+    buyPairs = buyPairs.map(pair => {
+        return {
+            "id": pair.id,
+            "base_currency": pair.base_currency,
+            "quote_currency": pair.quote_currency
+        }
+    })
+    sellPairs = sellPairs.map(pair => {
+        return {
+            "id": pair.id,
+            "base_currency": pair.base_currency,
+            "quote_currency": pair.quote_currency
+        }
+    })
+
+    return {
+        "buyPairs": buyPairs,
+        "sellPairs": sellPairs
+    }
+}
+
+export const handleTrigger = async (newListing: string): Promise<ResponseCode> => {
+
+    const tradingPairs = getTradingPairs(newListing, preferredTradingPair)
+
+    return ResponseCode.SUCCESS;
+}
+
+/*
+    order book calls return at depth 1
+    {
+    "sequence": "3",
+    "bids": [
+        [ price, size, num-orders ],
+    ],
+    "asks": [
+        [ price, size, num-orders ],
+    ]
+}
+
+*/
+
+// // Get the order book at a specific level of detail.
+// publicClient.getProductOrderBook('LTC-USD', { level: 3 }, callback);
+
+// Get Products allows you to see valid pairs; i.e. may not have USD support (but generally should)
+// https://docs.pro.coinbase.com/#products
+
+
+
+
 
 // Example from site for buy & sell
 // // Buy 1 BTC @ 100 USD
@@ -94,51 +163,21 @@ export const placeOrder = async (isBuy: boolean, isLimit: boolean, price: number
 // Get the order book at the default level of detail.
 // publicClient.getProductOrderBook('BTC-USD', callback);
 
-export const getBestCurrentPrice = async (tradingPair: string, depth: number): Promise<number> => {
-    const orderBook = await authedClient.getProductOrderBook(tradingPair, { level: depth })
-        .then()
-        .catch(err => {
-            console.error(err)
-        })
-    //const bestPrice = orderBook["asks"][1][0]
-    // more complicated decisions can be made if the order book depth is also used
 
-    return orderBook["asks"][1][0];
-}
 
-// need to determine which trading pairs are 
-export const getTradingPairs = async (baseCoin: string, getBuyPairs: boolean): Promise<string[]> => {
-    // getProducts returns the full list of trading pairs
-    const allPairs = authedClient.getProducts()
-        .then()
-        .catch(err => {
-            console.error(err)
-        });
+// client sdk https://github.com/coinbase/coinbase-pro-node
+// Listing data https://docs.google.com/spreadsheets/d/1y0SE1DtbaUltUHtGBzBgz9BXgzKGvk5SF1xjjK52grw/edit#gid=0
 
-    //const buyPairs = allPairs.filter((pair) => pair["quote_currency"] == baseCoin)
-    //const sellPairs = allPairs.filter((pair) => pair["base_currency"] == baseCoin)
 
-    if (getBuyPairs) return allPairs.filter((pair) => pair["quote_currency"] == baseCoin);
+// fetch the price of asset for cases where placing limit order
+// support market order
+// send telegram alert when order is placed (optional)
+// send alert when order is complete (optional but impt imo)
+// checks should be via cron or similar 
 
-    return allPairs.filter((pair) => pair["base_currency"] == baseCoin);
-}
 
-/*
-    order book calls return at depth 1
-    {
-    "sequence": "3",
-    "bids": [
-        [ price, size, num-orders ],
-    ],
-    "asks": [
-        [ price, size, num-orders ],
-    ]
-}
+// Order placing should go this way:
+// Coinbase pro listing identified, nothing should be done
+// coinbase all listing ided, should place order. Can check if it makes sense to do things early
 
-*/
-
-// // Get the order book at a specific level of detail.
-// publicClient.getProductOrderBook('LTC-USD', { level: 3 }, callback);
-
-// Get Products allows you to see valid pairs; i.e. may not have USD support (but generally should)
-// https://docs.pro.coinbase.com/#products
+// https://docs.pro.coinbase.com/#place-a-new-order
