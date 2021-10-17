@@ -76,7 +76,7 @@ var getTitle = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, regResultAll, buyOrderResult, boughtTokenAmount, tradingPair, sellOrderResult;
+    var title, regResultAll, buyOrderResult, settledTrade, boughtTokenAmount, tradingPair, sellOrderResult;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, getTitle()];
@@ -98,8 +98,11 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                 return [4 /*yield*/, custom_methods_1.initialPurchase(regResultAll, lastTitle, marketOrderAmount)];
             case 3:
                 buyOrderResult = _a.sent();
+                settledTrade = buyOrderResult.settled;
                 boughtTokenAmount = buyOrderResult.executed_value;
                 tradingPair = buyOrderResult.product_id;
+                if (!settledTrade)
+                    console.log('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
                 return [4 /*yield*/, listing_sell_logic_1.sellLogic(boughtTokenAmount, tradingPair)];
             case 4:
                 sellOrderResult = _a.sent();

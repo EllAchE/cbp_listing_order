@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.getTradingPairs = exports.getBestCurrentPriceFromOrderBook = exports.getOrderBook = exports.cancelSingleOrder = exports.cancelAllOrders = exports.placeMarketOrder = exports.placeLimitOrder = void 0;
+exports.getTradingPairs = exports.getBestCurrentPriceFromOrderBook = exports.getOrderBook = exports.cancelSingleOrder = exports.cancelAllOrders = exports.closePosition = exports.placeMarketOrder = exports.placeLimitOrder = void 0;
 var cbp = require('coinbase-pro');
 var typing_1 = require("./typing");
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
@@ -93,6 +93,14 @@ var placeMarketOrder = function (isBuy, amount, tradingPair) { return __awaiter(
     });
 }); };
 exports.placeMarketOrder = placeMarketOrder;
+var closePosition = function (productId) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, authedClient.closePosition({
+                product_id: productId // this needs to be tested, the docs weren't clear
+            })];
+    });
+}); };
+exports.closePosition = closePosition;
 var cancelAllOrders = function (productId) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2 /*return*/, authedClient.cancelAllOrders({ product_id: productId })]; // returns a list of the ids of open orders that were successfully cancelled

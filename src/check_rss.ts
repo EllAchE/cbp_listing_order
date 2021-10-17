@@ -56,8 +56,11 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
         else if (regResultAll && regResultAll.length === 1) { // will be null if nothing matches
             const buyOrderResult: OrderResult = await initialPurchase(regResultAll, lastTitle, marketOrderAmount);
 
+            const settledTrade = buyOrderResult.settled;
             const boughtTokenAmount = buyOrderResult.executed_value;
             const tradingPair = buyOrderResult.product_id; // todo validate that these types are good
+
+            if (!settledTrade) console.log('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.')
 
             const sellOrderResult: OrderResult = await sellLogic(boughtTokenAmount, tradingPair);
             return {

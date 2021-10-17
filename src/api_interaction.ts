@@ -57,6 +57,12 @@ export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPa
     }
 }
 
+export const closePosition = async (productId: string): Promise<OrderResult> => {
+    return authedClient.closePosition({
+        product_id: productId // this needs to be tested, the docs weren't clear
+    })
+}
+
 export const cancelAllOrders = async (productId: string): Promise<string[]> => {
     return authedClient.cancelAllOrders({ product_id: productId }); // returns a list of the ids of open orders that were successfully cancelled
 }
