@@ -1,14 +1,13 @@
 const cbp = require('coinbase-pro');
-import { BuySellPairs, ResponseCode, OrderBook, BuyOrSellString } from "./typing";
-import { AuthenticatedClient, OrderParams } from "coinbase-pro";
+import { BuySellPairs, ResponseCode, OrderBook, BuyOrSellString, TradingPair } from "./typing";
+import { AuthenticatedClient, OrderParams, OrderResult } from "coinbase-pro";
+import { RequestError } from "got/dist/source";
 
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
-// const preferredTradingPairs = ["USD", "BTC"]
-const preferredTradingPair = "USD"
 
 const apiURI = 'https://api.pro.coinbase.com';
-const sandboxURI = 'https://api-public.sandbox.pro.coinbase.com';
+//const sandboxURI = 'https://api-public.sandbox.pro.coinbase.com';
 
 const authedClient: AuthenticatedClient = new cbp.AuthenticatedClient(
     process.env.key,
@@ -37,31 +36,34 @@ const createMarketOrder = (amount: string, tradingPair: string, side: BuyOrSellS
     };
 }
 
-export const placeOrder = async (isBuy: boolean, isLimit: boolean, price: string, amount: string, tradingPair: string): Promise<void> => {
-    if (isBuy && isLimit) {
+export const placeLimitOrder = async (isBuy: boolean, price: string, amount: string, tradingPair: string): Promise<OrderResult> => {
+    if (isBuy) {
         const orderParams = createLimitOrder(price, amount, tradingPair, BuyOrSellString.Buy)
-        authedClient.buy(orderParams) // returns a promise
+        return authedClient.buy(orderParams) // returns a promise
     }
-    else if (isBuy && !isLimit) {
-        const orderParams = createMarketOrder(amount, tradingPair, BuyOrSellString.Buy)
-        authedClient.buy(orderParams) // returns a promise
-    }
-    else if (!isBuy && isLimit) {
+    else {
         const orderParams = createLimitOrder(price, amount, tradingPair, BuyOrSellString.Sell)
-        authedClient.sell(orderParams) // returns a promise
-    }
-    else if (!isBuy && !isLimit) {
-        const orderParams = createMarketOrder(amount, tradingPair, BuyOrSellString.Sell)
-        authedClient.sell(orderParams) // returns a promise
+        return authedClient.sell(orderParams) // returns a promise
     }
 }
 
-export const cancelAllOrders = async (): Promise<string[]> => {
-    return authedClient.cancelAllOrders(); // returns a list of the ids of open orders that were successfully cancelled
+export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPair: string): Promise<OrderResult> => {
+    if (isBuy) {
+        const orderParams = createMarketOrder(amount, tradingPair, BuyOrSellString.Buy)
+        return authedClient.buy(orderParams) // returns a promise
+    }
+    else {
+        const orderParams = createMarketOrder(amount, tradingPair, BuyOrSellString.Sell)
+        return authedClient.sell(orderParams) // returns a promise
+    }
+}
+
+export const cancelAllOrders = async (productId: string): Promise<string[]> => {
+    return authedClient.cancelAllOrders({ product_id: productId }); // returns a list of the ids of open orders that were successfully cancelled
 }
 
 export const cancelSingleOrder = async (orderId: string): Promise<string[]> => {
-    authedClient.cancelOrder()
+    return authedClient.cancelOrder(orderId); // requires ID to cancel
 }
 
 // trading pair is a string like BTC-USD. Depth caps at 3 (unaggrated orders). 2 is aggregated, 1 is just best
@@ -79,49 +81,47 @@ export const getBestCurrentPriceFromOrderBook = async (orderBook: OrderBook): Pr
     return orderBook["asks"][1][0];
 }
 
-export const getCurrentPriceWithDepthOf20k = async (orderBook: OrderBook): Promise<number> => {
-    const orderBookVolume = 0;
-    while (orderBookVolume < 20000)
-        return orderBook["asks"][1][0];
-}
+// export const getCurrentPriceWithDepthOf20k = async (orderBook: OrderBook): Promise<number|undefined> => {
+//     const orderBookVolume = 0;
+//     while (orderBookVolume < 20000)
+//         return orderBook["asks"][1][0];
+// }
 
 // need to determine which trading pairs are available
-export const getTradingPairs = async (baseCoin: string, tradingPair: string): Promise<BuySellPairs> => {
+export const getTradingPairs = async (baseCoin: string, quoteCoin: string): Promise<BuySellPairs> => {
     // getProducts returns the full list of trading pairs
     const allPairs = await authedClient.getProducts()
         .catch(err => {
             console.error(err)
         });
 
-    let sellPairs = allPairs.filter((pair) => pair["base_currency"] == baseCoin && pair["quote_currency"] == tradingPair);
-    let buyPairs = allPairs.filter((pair) => pair["quote_currency"] == baseCoin && pair["base_currency"] == tradingPair);
-    buyPairs = buyPairs.map(pair => {
-        return {
-            "id": pair.id,
-            "base_currency": pair.base_currency,
-            "quote_currency": pair.quote_currency
-        }
-    })
-    sellPairs = sellPairs.map(pair => {
-        return {
-            "id": pair.id,
-            "base_currency": pair.base_currency,
-            "quote_currency": pair.quote_currency
-        }
-    })
+    if (allPairs) {
+        let sellPairs = allPairs.filter((pair) => pair["base_currency"] == baseCoin && pair["quote_currency"] == quoteCoin);
+        let buyPairs = allPairs.filter((pair) => pair["quote_currency"] == baseCoin && pair["base_currency"] == quoteCoin);
 
-    return {
-        "buyPairs": buyPairs,
-        "sellPairs": sellPairs
+        let buyPairsShort: TradingPair[] = buyPairs.map(pair => {
+            return {
+                "id": pair.id,
+                "base_currency": pair.base_currency,
+                "quote_currency": pair.quote_currency
+            }
+        })
+        let sellPairsShort: TradingPair[] = sellPairs.map(pair => {
+            return {
+                "id": pair.id,
+                "base_currency": pair.base_currency,
+                "quote_currency": pair.quote_currency
+            }
+        })
+
+        return {
+            "buyPairs": buyPairsShort,
+            "sellPairs": sellPairsShort
+        }
     }
+    throw new RequestError(`no pair between base ${baseCoin} and quote ${quoteCoin} exists`)
 }
 
-export const handleTrigger = async (newListing: string): Promise<ResponseCode> => {
-
-    const tradingPairs = getTradingPairs(newListing, preferredTradingPair)
-
-    return ResponseCode.SUCCESS;
-}
 
 /*
     order book calls return at depth 1

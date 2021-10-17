@@ -1,7 +1,7 @@
 {
   "name": "cbp_listing_order",
   "version": "1.0.0",
-  "description": "",
+  "description": "API Docs - https://docs.pro.coinbase.com/",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,5 +22,6 @@
     "crypto": "^1.0.1",
     "got": "^11.8.2",
     "rss-parser": "^3.12.0"
-  }
+  },
+  "devDependencies": {}
 }

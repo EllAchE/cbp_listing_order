@@ -1,4 +1,4 @@
-import { OrderParams, LimitOrder } from "coinbase-pro";
+import { OrderParams, LimitOrder, OrderResult } from "coinbase-pro";
 
 // export interface MarketOrder {
 //     //side: string
@@ -36,7 +36,8 @@ export interface OrderBook {
 }
 
 export interface LoggingResponse {
-    successfulOrder: boolean
+    orderResult: OrderResult | undefined
     title: string
-    error: string
+    titleChanged: boolean
+    error: string | undefined
 }
