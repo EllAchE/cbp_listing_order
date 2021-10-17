@@ -1,7 +1,7 @@
-import { placeMarketOrder } from "./api_interaction";
 import { LoggingResponse } from "./typing";
 import { CronJob } from 'cron';
 import { OrderResult } from "coinbase-pro";
+import { initialPurchase } from "./custom_methods";
 
 const got = require('got');
 const rss = require('rss-parser');
@@ -49,7 +49,7 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
             }
         }
         else if (regResultAll && regResultAll.length === 1) { // will be null if nothing matches
-            const orderResult: OrderResult = await initialPurchase(regResultAll, lastTitle);
+            const orderResult: OrderResult = await initialPurchase(regResultAll, lastTitle, marketOrderAmount);
             return {
                 "orderResult": orderResult,
                 "title": lastTitle,
@@ -66,6 +66,7 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
             }
         }
     }
+
     else {
         return {
             "orderResult": undefined,

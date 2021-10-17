@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.cronUpdate = void 0;
 var cron_1 = require("cron");
+var custom_methods_1 = require("./custom_methods");
 var got = require('got');
 var rss = require('rss-parser');
 var marketOrderAmount = '3000'; // must be a string for api methods
@@ -88,7 +89,7 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                     }];
             case 2:
                 if (!(regResultAll && regResultAll.length === 1)) return [3 /*break*/, 4];
-                return [4 /*yield*/, initialPurchase(regResultAll, lastTitle)];
+                return [4 /*yield*/, custom_methods_1.initialPurchase(regResultAll, lastTitle, marketOrderAmount)];
             case 3:
                 orderResult = _a.sent();
                 return [2 /*return*/, {

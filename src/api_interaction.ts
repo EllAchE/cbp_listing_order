@@ -1,7 +1,6 @@
 const cbp = require('coinbase-pro');
-import { BuySellPairs, ResponseCode, OrderBook, BuyOrSellString, TradingPair } from "./typing";
+import { BuySellPairs, OrderBook, BuyOrSellString, TradingPair } from "./typing";
 import { AuthenticatedClient, OrderParams, OrderResult } from "coinbase-pro";
-import { RequestError } from "got/dist/source";
 
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
@@ -119,7 +118,7 @@ export const getTradingPairs = async (baseCoin: string, quoteCoin: string): Prom
             "sellPairs": sellPairsShort
         }
     }
-    throw new RequestError(`no pair between base ${baseCoin} and quote ${quoteCoin} exists`)
+    throw new Error(`no pair between base ${baseCoin} and quote ${quoteCoin} exists`)
 }
 
 

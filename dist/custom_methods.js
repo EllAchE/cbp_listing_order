@@ -36,18 +36,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.initialPurchase = exports.handleTrigger = void 0;
+exports.initialPurchase = void 0;
 var api_interaction_1 = require("./api_interaction");
-var typing_1 = require("./typing");
-var handleTrigger = function (newListing) { return __awaiter(void 0, void 0, void 0, function () {
-    var tradingPairs;
-    return __generator(this, function (_a) {
-        tradingPairs = api_interaction_1.getTradingPairs(newListing, preferredTradingPair);
-        return [2 /*return*/, typing_1.ResponseCode.SUCCESS];
-    });
-}); };
-exports.handleTrigger = handleTrigger;
-function initialPurchase(regResultAll, lastTitle) {
+// export const handleTrigger = async (newListing: string, preferredTradingPair: string): Promise<ResponseCode> => {
+//     const tradingPairs = getTradingPairs(newListing, preferredTradingPair)
+//     return ResponseCode.SUCCESS;
+// }
+function initialPurchase(regResultAll, lastTitle, marketOrderAmount) {
     return __awaiter(this, void 0, void 0, function () {
         var tradingPair;
         return __generator(this, function (_a) {

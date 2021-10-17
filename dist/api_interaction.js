@@ -39,7 +39,6 @@ exports.__esModule = true;
 exports.getTradingPairs = exports.getBestCurrentPriceFromOrderBook = exports.getOrderBook = exports.cancelSingleOrder = exports.cancelAllOrders = exports.placeMarketOrder = exports.placeLimitOrder = void 0;
 var cbp = require('coinbase-pro');
 var typing_1 = require("./typing");
-var source_1 = require("got/dist/source");
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
 var apiURI = 'https://api.pro.coinbase.com';
@@ -162,7 +161,7 @@ var getTradingPairs = function (baseCoin, quoteCoin) { return __awaiter(void 0, 
                             "sellPairs": sellPairsShort
                         }];
                 }
-                throw new source_1.RequestError("no pair between base " + baseCoin + " and quote " + quoteCoin + " exists");
+                throw new Error("no pair between base " + baseCoin + " and quote " + quoteCoin + " exists");
         }
     });
 }); };

@@ -1,4 +1,4 @@
-import { OrderParams, LimitOrder, OrderResult } from "coinbase-pro";
+import { OrderResult } from "coinbase-pro";
 
 // export interface MarketOrder {
 //     //side: string
