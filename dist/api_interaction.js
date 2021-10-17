@@ -41,9 +41,10 @@ var cbp = require('coinbase-pro');
 var typing_1 = require("./typing");
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
-var apiURI = 'https://api.pro.coinbase.com';
 //const sandboxURI = 'https://api-public.sandbox.pro.coinbase.com';
-var authedClient = new cbp.AuthenticatedClient(process.env.key, process.env.secret, process.env.passphrase, apiURI);
+var apiURI = 'https://api.pro.coinbase.com';
+var authedClient = new cbp.AuthenticatedClient(// initialize your ordering client
+process.env.key, process.env.secret, process.env.passphrase, apiURI);
 var createLimitOrder = function (price, amount, tradingPair, side) {
     return {
         type: "limit",
@@ -104,7 +105,7 @@ var cancelSingleOrder = function (orderId) { return __awaiter(void 0, void 0, vo
     });
 }); };
 exports.cancelSingleOrder = cancelSingleOrder;
-// trading pair is a string like BTC-USD. Depth caps at 3 (unaggrated orders). 2 is aggregated, 1 is just best
+// trading pair is a string like BTC-USD. Depth caps at 3 (unaggregated orders). 2 is aggregated, 1 is just best
 var getOrderBook = function (tradingPair, depth) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {

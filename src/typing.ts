@@ -36,7 +36,8 @@ export interface OrderBook {
 }
 
 export interface LoggingResponse {
-    orderResult: OrderResult | undefined
+    buyOrderResult: OrderResult | undefined
+    sellOrderResult: OrderResult | undefined
     title: string
     titleChanged: boolean
     error: string | undefined

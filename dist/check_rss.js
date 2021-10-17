@@ -39,20 +39,28 @@ exports.__esModule = true;
 exports.cronUpdate = void 0;
 var cron_1 = require("cron");
 var custom_methods_1 = require("./custom_methods");
+var listing_sell_logic_1 = require("./listing_sell_logic");
+//const fs = require('fs');
 var got = require('got');
 var rss = require('rss-parser');
 var marketOrderAmount = '3000'; // must be a string for api methods
 var cronString = "0 * 23,7-23 * * *";
 // run every minute, all hours except midnight-7am. Need to check TZ
 // also could probably ignore saturdays as possible listing date
+var regPatternAll = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coinbase)/);
+// const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/)
+// only runs for regular listings, can't buy on cbp when they list
 var lastTitle;
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
     console.log("Coinbase listing cron executed at " + new Date().toLocaleString());
     try {
-        checkFeed(lastTitle);
+        // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
+        checkFeed(lastTitle).then(function (logResponse) {
+            console.log(logResponse);
+        })["catch"](function (err) { return console.log(err); });
     }
     catch (err) {
-        console.log("cron error", err);
+        console.log("cron error", err); // promise return means this catch block shouldn't be executed
     }
 }, null, false);
 var getTitle = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -67,52 +75,58 @@ var getTitle = function () { return __awaiter(void 0, void 0, void 0, function (
         }
     });
 }); };
-var regPatternAll = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coinbase)/);
-// const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/)
-// only runs for regular listings, can't buy on cbp when they list
 var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, regResultAll, orderResult;
+    var title, regResultAll, buyOrderResult, boughtTokenAmount, tradingPair, sellOrderResult;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, getTitle()];
             case 1:
                 title = _a.sent();
-                if (!(title != lastTitle)) return [3 /*break*/, 6];
+                if (!(title != lastTitle)) return [3 /*break*/, 7];
                 lastTitle = title;
                 regResultAll = regPatternAll.exec(title);
                 if (!(!regResultAll || regResultAll.length < 1)) return [3 /*break*/, 2];
                 return [2 /*return*/, {
-                        "orderResult": undefined,
+                        "buyOrderResult": undefined,
+                        "sellOrderResult": undefined,
                         "title": lastTitle,
                         "titleChanged": true,
                         "error": "regex retrieval didn't find a match, or somehow returned null"
                     }];
             case 2:
-                if (!(regResultAll && regResultAll.length === 1)) return [3 /*break*/, 4];
+                if (!(regResultAll && regResultAll.length === 1)) return [3 /*break*/, 5];
                 return [4 /*yield*/, custom_methods_1.initialPurchase(regResultAll, lastTitle, marketOrderAmount)];
             case 3:
-                orderResult = _a.sent();
+                buyOrderResult = _a.sent();
+                boughtTokenAmount = buyOrderResult.executed_value;
+                tradingPair = buyOrderResult.product_id;
+                return [4 /*yield*/, listing_sell_logic_1.sellLogic(boughtTokenAmount, tradingPair)];
+            case 4:
+                sellOrderResult = _a.sent();
                 return [2 /*return*/, {
-                        "orderResult": orderResult,
+                        "buyOrderResult": buyOrderResult,
+                        "sellOrderResult": sellOrderResult,
                         "title": lastTitle,
                         "titleChanged": true,
                         "error": undefined // todo add try catch here and everywhere
                     }];
-            case 4: // can have more checks here if needed
+            case 5: // can have more checks here if needed
             return [2 /*return*/, {
-                    "orderResult": undefined,
+                    "buyOrderResult": undefined,
+                    "sellOrderResult": undefined,
                     "title": lastTitle,
                     "titleChanged": true,
                     "error": "regex retrieval returned array with more than one element"
                 }];
-            case 5: return [3 /*break*/, 7];
-            case 6: return [2 /*return*/, {
-                    "orderResult": undefined,
+            case 6: return [3 /*break*/, 8];
+            case 7: return [2 /*return*/, {
+                    "buyOrderResult": undefined,
+                    "sellOrderResult": undefined,
                     "title": lastTitle,
                     "titleChanged": false,
                     "error": undefined
                 }];
-            case 7: return [2 /*return*/];
+            case 8: return [2 /*return*/];
         }
     });
 }); };

@@ -5,10 +5,10 @@ import { AuthenticatedClient, OrderParams, OrderResult } from "coinbase-pro";
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
 
-const apiURI = 'https://api.pro.coinbase.com';
 //const sandboxURI = 'https://api-public.sandbox.pro.coinbase.com';
+const apiURI = 'https://api.pro.coinbase.com';
 
-const authedClient: AuthenticatedClient = new cbp.AuthenticatedClient(
+const authedClient: AuthenticatedClient = new cbp.AuthenticatedClient( // initialize your ordering client
     process.env.key,
     process.env.secret,
     process.env.passphrase,
@@ -65,7 +65,7 @@ export const cancelSingleOrder = async (orderId: string): Promise<string[]> => {
     return authedClient.cancelOrder(orderId); // requires ID to cancel
 }
 
-// trading pair is a string like BTC-USD. Depth caps at 3 (unaggrated orders). 2 is aggregated, 1 is just best
+// trading pair is a string like BTC-USD. Depth caps at 3 (unaggregated orders). 2 is aggregated, 1 is just best
 export const getOrderBook = async (tradingPair: string, depth: number): Promise<OrderBook> => {
     return await authedClient.getProductOrderBook(tradingPair, { level: depth })
         .catch(err => {
