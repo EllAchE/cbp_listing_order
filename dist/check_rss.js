@@ -40,6 +40,7 @@ exports.cronUpdate = void 0;
 var cron_1 = require("cron");
 var custom_methods_1 = require("./custom_methods");
 var listing_sell_logic_1 = require("./listing_sell_logic");
+var utils_1 = require("./utils");
 //const fs = require('fs');
 var got = require('got');
 var rss = require('rss-parser');
@@ -76,13 +77,13 @@ var getTitle = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, regResultAll, buyOrderResult, settledTrade, boughtTokenAmount, tradingPair, sellOrderResult;
+    var title, regResultAll, tradingPair, buyOrderResult, settledTrade, boughtTokenAmount, tradingPairReturn, sellOrderResult;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, getTitle()];
             case 1:
                 title = _a.sent();
-                if (!(title != lastTitle)) return [3 /*break*/, 7];
+                if (!(title != lastTitle)) return [3 /*break*/, 9];
                 lastTitle = title;
                 regResultAll = regPatternAll.exec(title);
                 if (!(!regResultAll || regResultAll.length < 1)) return [3 /*break*/, 2];
@@ -94,16 +95,18 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         "error": "regex retrieval didn't find a match, or somehow returned null"
                     }];
             case 2:
-                if (!(regResultAll && regResultAll.length === 1)) return [3 /*break*/, 5];
-                return [4 /*yield*/, custom_methods_1.initialPurchase(regResultAll, lastTitle, marketOrderAmount)];
+                if (!(regResultAll && regResultAll.length === 1)) return [3 /*break*/, 7];
+                tradingPair = utils_1.getTradingPairFromRegResult(regResultAll);
+                if (!tradingPair) return [3 /*break*/, 5];
+                return [4 /*yield*/, custom_methods_1.initialPurchase(tradingPair, marketOrderAmount)];
             case 3:
                 buyOrderResult = _a.sent();
                 settledTrade = buyOrderResult.settled;
                 boughtTokenAmount = buyOrderResult.executed_value;
-                tradingPair = buyOrderResult.product_id;
+                tradingPairReturn = buyOrderResult.product_id;
                 if (!settledTrade)
                     console.log('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
-                return [4 /*yield*/, listing_sell_logic_1.sellLogic(boughtTokenAmount, tradingPair)];
+                return [4 /*yield*/, listing_sell_logic_1.sellLogic(boughtTokenAmount, tradingPairReturn)];
             case 4:
                 sellOrderResult = _a.sent();
                 return [2 /*return*/, {
@@ -113,7 +116,17 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         "titleChanged": true,
                         "error": undefined // todo add try catch here and everywhere
                     }];
-            case 5: // can have more checks here if needed
+            case 5:
+                console.log('trading pair ended up undefined or had multiple matches');
+                return [2 /*return*/, {
+                        "buyOrderResult": undefined,
+                        "sellOrderResult": undefined,
+                        "title": lastTitle,
+                        "titleChanged": true,
+                        "error": 'trading pair ended up undefined' // todo add try catch here and everywhere
+                    }];
+            case 6: return [3 /*break*/, 8];
+            case 7: // can have more checks here if needed
             return [2 /*return*/, {
                     "buyOrderResult": undefined,
                     "sellOrderResult": undefined,
@@ -121,15 +134,15 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                     "titleChanged": true,
                     "error": "regex retrieval returned array with more than one element"
                 }];
-            case 6: return [3 /*break*/, 8];
-            case 7: return [2 /*return*/, {
+            case 8: return [3 /*break*/, 10];
+            case 9: return [2 /*return*/, {
                     "buyOrderResult": undefined,
                     "sellOrderResult": undefined,
                     "title": lastTitle,
                     "titleChanged": false,
                     "error": undefined
                 }];
-            case 8: return [2 /*return*/];
+            case 10: return [2 /*return*/];
         }
     });
 }); };

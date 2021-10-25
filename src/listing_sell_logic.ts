@@ -12,7 +12,7 @@ export const sellLogic = async (boughtTokenAmount: string, tradingPair: string):
     /*
         Options are: Stop Limit, Limit, Market after time, constantly rising limit (trailing limit)
     */
-    sleep(120) // poor implementation of await, but setTimeout return type is weird
+    sleep(180) // poor implementation of await, but setTimeout return type is weird
     return await placeMarketOrder(false, boughtTokenAmount, tradingPair)
 }
 

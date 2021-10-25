@@ -50,7 +50,7 @@ var sellLogic = function (boughtTokenAmount, tradingPair) { return __awaiter(voi
                 /*
                     Options are: Stop Limit, Limit, Market after time, constantly rising limit (trailing limit)
                 */
-                sleep(120); // poor implementation of await, but setTimeout return type is weird
+                sleep(180); // poor implementation of await, but setTimeout return type is weird
                 return [4 /*yield*/, api_interaction_1.placeMarketOrder(false, boughtTokenAmount, tradingPair)];
             case 1: // poor implementation of await, but setTimeout return type is weird
             return [2 /*return*/, _a.sent()];

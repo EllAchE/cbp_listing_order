@@ -42,16 +42,12 @@ var api_interaction_1 = require("./api_interaction");
 //     const tradingPairs = getTradingPairs(newListing, preferredTradingPair)
 //     return ResponseCode.SUCCESS;
 // }
-function initialPurchase(regResultAll, lastTitle, marketOrderAmount) {
+function initialPurchase(tradingPair, marketOrderAmount) {
     return __awaiter(this, void 0, void 0, function () {
-        var tradingPair;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    tradingPair = "USD-" + regResultAll[0];
-                    return [4 /*yield*/, api_interaction_1.placeMarketOrder(true, marketOrderAmount, tradingPair)];
-                case 1: // Assuming everything has a USD pair on cbp, seems to be
-                return [2 /*return*/, _a.sent()]; // naive implementation, immediate market order of $3000
+                case 0: return [4 /*yield*/, api_interaction_1.placeMarketOrder(true, marketOrderAmount, tradingPair)];
+                case 1: return [2 /*return*/, _a.sent()]; // naive implementation, immediate market order of $3000
             }
         });
     });

@@ -3,6 +3,7 @@ import { CronJob } from 'cron';
 import { OrderResult } from "coinbase-pro";
 import { initialPurchase } from "./custom_methods";
 import { sellLogic } from "./listing_sell_logic";
+import { getTradingPairFromRegResult } from "./utils";
 
 //const fs = require('fs');
 const got = require('got');
@@ -16,6 +17,7 @@ const regPatternAll = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coin
 // const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/)
 // only runs for regular listings, can't buy on cbp when they list
 var lastTitle;
+
 export const cronUpdate = new CronJob(cronString, function (): void {
     console.log(`Coinbase listing cron executed at ${new Date().toLocaleString()}`);
     try {
@@ -54,22 +56,36 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
             }
         }
         else if (regResultAll && regResultAll.length === 1) { // will be null if nothing matches
-            const buyOrderResult: OrderResult = await initialPurchase(regResultAll, lastTitle, marketOrderAmount);
+            const tradingPair = getTradingPairFromRegResult(regResultAll); // Assuming everything has a USD pair on cbp, seems to be
+            if (tradingPair) {
+                const buyOrderResult: OrderResult = await initialPurchase(tradingPair, marketOrderAmount);
 
-            const settledTrade = buyOrderResult.settled;
-            const boughtTokenAmount = buyOrderResult.executed_value;
-            const tradingPair = buyOrderResult.product_id; // todo validate that these types are good
+                const settledTrade = buyOrderResult.settled;
+                const boughtTokenAmount = buyOrderResult.executed_value;
+                const tradingPairReturn = buyOrderResult.product_id; // todo validate that these types are good
 
-            if (!settledTrade) console.log('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.')
+                if (!settledTrade) console.log('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.')
 
-            const sellOrderResult: OrderResult = await sellLogic(boughtTokenAmount, tradingPair);
-            return {
-                "buyOrderResult": buyOrderResult,
-                "sellOrderResult": sellOrderResult,
-                "title": lastTitle,
-                "titleChanged": true,
-                "error": undefined // todo add try catch here and everywhere
-            };
+                const sellOrderResult: OrderResult = await sellLogic(boughtTokenAmount, tradingPairReturn);
+                return {
+                    "buyOrderResult": buyOrderResult,
+                    "sellOrderResult": sellOrderResult,
+                    "title": lastTitle,
+                    "titleChanged": true,
+                    "error": undefined // todo add try catch here and everywhere
+                };
+            }
+            else {
+                console.log('trading pair ended up undefined or had multiple matches')
+                return {
+                    "buyOrderResult": undefined,
+                    "sellOrderResult": undefined,
+                    "title": lastTitle,
+                    "titleChanged": true,
+                    "error": 'trading pair ended up undefined' // todo add try catch here and everywhere
+                };
+            }
+
         }
         else { // can have more checks here if needed
             return {
