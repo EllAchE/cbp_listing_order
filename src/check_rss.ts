@@ -57,9 +57,7 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
         }
         else {
             logger.info("regex didn't find a match on the title, or somehow returned null. Title was", title)
-            const logResponse = createBaseLoggingResponse();
-            logResponse.title = lastTitle;
-            logResponse.error = "regex retrieval didn't find a match, or somehow returned null";
+            const logResponse = createBaseLoggingResponse({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
             return [logResponse];
         }
 
@@ -71,10 +69,7 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
                     if (!buyOrderResult.settled) logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.')
                     const sellOrderResult: OrderResult = await sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id);
 
-                    const logResponse = createBaseLoggingResponse();
-                    logResponse.title = lastTitle;
-                    logResponse.buyOrderResult = buyOrderResult;
-                    logResponse.sellOrderResult = sellOrderResult;
+                    const logResponse = createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
                     logger.info(logResponse)
                     return logResponse;
                 }))
@@ -89,16 +84,12 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
         else {
             logger.warn('trading pair ended up undefined/empty')
 
-            const logResponse = createBaseLoggingResponse();
-            logResponse.title = lastTitle;
-            logResponse.error = 'trading pair ended up undefined'
+            const logResponse = createBaseLoggingResponse({ title: lastTitle, error: 'trading pair ended up undefined', buyOrderResult: undefined, sellOrderResult: undefined });
             return [logResponse];
         }
     }
     else { // can have more checks here if needed
-        const logResponse = createBaseLoggingResponse();
-        logResponse.title = lastTitle;
-        logResponse.titleChanged = false;
+        const logResponse = createBaseLoggingResponse({ title: lastTitle, titleChanged: false, error: undefined, buyOrderResult: undefined, sellOrderResult: undefined });
         return [logResponse];
     }
 }

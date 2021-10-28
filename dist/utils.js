@@ -15,13 +15,14 @@ var getTradingPairsFromTitle = function (titleString) {
     }
 };
 exports.getTradingPairsFromTitle = getTradingPairsFromTitle;
-var createBaseLoggingResponse = function () {
+var createBaseLoggingResponse = function (_a) {
+    var _b = _a.title, title = _b === void 0 ? "TITLE NOT SET ON LOGGING RESPONSE" : _b, buyOrderResult = _a.buyOrderResult, sellOrderResult = _a.sellOrderResult, error = _a.error, _c = _a.titleChanged, titleChanged = _c === void 0 ? true : _c;
     return {
-        buyOrderResult: undefined,
-        sellOrderResult: undefined,
-        title: "TITLE NOT SET ON LOGGING RESPONSE",
-        titleChanged: true,
-        error: undefined,
+        buyOrderResult: buyOrderResult,
+        sellOrderResult: sellOrderResult,
+        title: title,
+        titleChanged: titleChanged,
+        error: error,
         time: new Date().toLocaleDateString()
     };
 };

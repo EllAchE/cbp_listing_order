@@ -96,9 +96,7 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                     }
                     else {
                         logger_1.logger.info("regex didn't find a match on the title, or somehow returned null. Title was", title);
-                        logResponse = utils_1.createBaseLoggingResponse();
-                        logResponse.title = lastTitle;
-                        logResponse.error = "regex retrieval didn't find a match, or somehow returned null";
+                        logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
                         return [2 /*return*/, [logResponse]];
                     }
                     if (tradingPairArray) {
@@ -115,10 +113,7 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                                             return [4 /*yield*/, listing_sell_logic_1.sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id)];
                                         case 1:
                                             sellOrderResult = _a.sent();
-                                            logResponse = utils_1.createBaseLoggingResponse();
-                                            logResponse.title = lastTitle;
-                                            logResponse.buyOrderResult = buyOrderResult;
-                                            logResponse.sellOrderResult = sellOrderResult;
+                                            logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
                                             logger_1.logger.info(logResponse);
                                             return [2 /*return*/, logResponse];
                                     }
@@ -143,16 +138,12 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                     }
                     else {
                         logger_1.logger.warn('trading pair ended up undefined/empty');
-                        logResponse = utils_1.createBaseLoggingResponse();
-                        logResponse.title = lastTitle;
-                        logResponse.error = 'trading pair ended up undefined';
+                        logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, error: 'trading pair ended up undefined', buyOrderResult: undefined, sellOrderResult: undefined });
                         return [2 /*return*/, [logResponse]];
                     }
                 }
                 else { // can have more checks here if needed
-                    logResponse = utils_1.createBaseLoggingResponse();
-                    logResponse.title = lastTitle;
-                    logResponse.titleChanged = false;
+                    logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, titleChanged: false, error: undefined, buyOrderResult: undefined, sellOrderResult: undefined });
                     return [2 /*return*/, [logResponse]];
                 }
                 return [2 /*return*/];

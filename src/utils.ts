@@ -15,13 +15,19 @@ export const getTradingPairsFromTitle = (titleString: string): string[] => {
     }
 }
 
-export const createBaseLoggingResponse = (): LoggingResponse => {
+export const createBaseLoggingResponse = ({
+    title = "TITLE NOT SET ON LOGGING RESPONSE",
+    buyOrderResult,
+    sellOrderResult,
+    error,
+    titleChanged = true,
+}): LoggingResponse => {
     return {
-        buyOrderResult: undefined,
-        sellOrderResult: undefined,
-        title: "TITLE NOT SET ON LOGGING RESPONSE",
-        titleChanged: true,
-        error: undefined,
+        buyOrderResult: buyOrderResult,
+        sellOrderResult: sellOrderResult,
+        title: title,
+        titleChanged: titleChanged,
+        error: error,
         time: new Date().toLocaleDateString()
     }
 }
