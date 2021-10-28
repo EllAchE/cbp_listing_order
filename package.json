@@ -24,5 +24,8 @@
     "jest": "^27.3.0",
     "rss-parser": "^3.12.0",
     "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2"
   }
 }

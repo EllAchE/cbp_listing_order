@@ -1,6 +1,6 @@
 import { LoggingResponse } from "./typing";
 import { CronJob } from 'cron';
-import { createBaseLoggingResponse, getTradingPairsFromTitle } from "./utils";
+import { checkIfTitleIsAllListing, createBaseLoggingResponse, getTradingPairsFromTitle } from "./utils";
 import { logger } from "./logger";
 import { executeTrades } from "./custom_methods";
 
@@ -9,9 +9,6 @@ const got = require('got');
 const rss = require('rss-parser');
 
 const cronString = `0 * 23,7-23 * * *`; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
-const regPatternAllSingle = new RegExp(/(?<=\()(\w{1,10})(?=\) is now available on Coinbase)/i) // for singular item listing
-const regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,10})(?=\) are now available on Coinbase)/i) // for multiple item listing
-// const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/) // only runs for regular listings, can't buy on cbp when they list
 
 var lastTitle;
 
@@ -28,7 +25,7 @@ export const cronUpdate = new CronJob(cronString, function (): void {
     }
 }, null, false);
 
-const getTitle = async (): Promise<string> => {
+export const getBlogTitle = async (): Promise<string> => {
     return await got('https://blog.coinbase.com/feed').then(response => {
         const parser = new rss();
         const content = parser.parseString(response.body)
@@ -39,13 +36,13 @@ const getTitle = async (): Promise<string> => {
 }
 
 const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
-    const title = await getTitle();
+    const title = await getBlogTitle();
 
     if (title != lastTitle) { // execute orders here
         lastTitle = title;
         let tradingPairArray: string[];
 
-        if (regPatternAllMultiple.test(title) || regPatternAllSingle.test(title)) {
+        if (checkIfTitleIsAllListing(title)) {
             tradingPairArray = getTradingPairsFromTitle(title);
             logger.info(`retrieved trading pair from new title, value is ${tradingPairArray}`)
             return executeTrades(tradingPairArray, lastTitle);
