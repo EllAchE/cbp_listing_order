@@ -48,8 +48,8 @@ var rss = require('rss-parser');
 var cronString = "0 * 23,7-23 * * *";
 // run every minute, all hours except midnight-7am. Need to check TZ
 // also could probably ignore saturdays as possible listing date
-var regPatternAllSingle = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coinbase)/); // for singular item listing
-var regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,5})(?=\) are now available on Coinbase)/); // for multiple item listing
+var regPatternAllSingle = new RegExp(/(?<=\()(\w{1,10})(?=\) is now available on Coinbase)/i); // for singular item listing
+var regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,10})(?=\) are now available on Coinbase)/i); // for multiple item listing
 // const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/)
 // only runs for regular listings, can't buy on cbp when they list
 var lastTitle;
@@ -80,89 +80,72 @@ var getTitle = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, isMultipleListing, isSingleListing, regResultAll, tradingPair, buyOrderResult, settledTrade, boughtTokenAmount, tradingPairReturn, sellOrderResult;
+    var title, tradingPairArray, logResponse, logResponse, logResponse;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, getTitle()];
             case 1:
                 title = _a.sent();
-                if (!(title != lastTitle)) return [3 /*break*/, 9];
-                lastTitle = title;
-                isMultipleListing = regPatternAllSingle.test(title);
-                isSingleListing = regPatternAllMultiple.test(title);
-                regResultAll = void 0;
-                if (isSingleListing) {
-                    regResultAll = regPatternAllSingle.exec(title);
+                if (title != lastTitle) { // execute orders here
+                    lastTitle = title;
+                    tradingPairArray = void 0;
+                    if (regPatternAllMultiple.test(title)) {
+                        tradingPairArray = utils_1.getTradingPairsFromTitle(title);
+                        logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPairArray);
+                    }
+                    else if (regPatternAllSingle.test(title)) {
+                        tradingPairArray = utils_1.getTradingPairsFromTitle(title);
+                        logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPairArray);
+                    }
+                    else {
+                        logger_1.logger.info("regex didn't find a match on the title, or somehow returned null. Title was", title);
+                        logResponse = utils_1.createBaseLoggingResponse();
+                        logResponse.title = lastTitle;
+                        logResponse.error = "regex retrieval didn't find a match, or somehow returned null";
+                        return [2 /*return*/, [logResponse]];
+                    }
+                    if (tradingPairArray) {
+                        tradingPairArray.forEach(function (pair) {
+                            var arr = [];
+                            arr.push(custom_methods_1.initialPurchase(pair, utils_1.marketOrderAmount).then(function (buyOrderResult) { return __awaiter(void 0, void 0, void 0, function () {
+                                var sellOrderResult, logResponse;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            logger_1.logger.info("received order result: " + buyOrderResult);
+                                            if (!buyOrderResult.settled)
+                                                logger_1.logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
+                                            return [4 /*yield*/, listing_sell_logic_1.sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id)];
+                                        case 1:
+                                            sellOrderResult = _a.sent();
+                                            logResponse = utils_1.createBaseLoggingResponse();
+                                            logResponse.title = lastTitle;
+                                            logResponse.buyOrderResult = buyOrderResult;
+                                            logResponse.sellOrderResult = sellOrderResult;
+                                            logger_1.logger.info(logResponse);
+                                            return [2 /*return*/, logResponse];
+                                    }
+                                });
+                            }); }));
+                        });
+                        arr = arr.ma;
+                        return [2 /*return*/, a];
+                    }
+                    else {
+                        logger_1.logger.warn('trading pair ended up undefined/empty');
+                        logResponse = utils_1.createBaseLoggingResponse();
+                        logResponse.title = lastTitle;
+                        logResponse.error = 'trading pair ended up undefined';
+                        return [2 /*return*/, [logResponse]];
+                    }
                 }
-                else if (isMultipleListing) {
-                    regResultAll = regPatternAllMultiple.exec(title);
+                else { // can have more checks here if needed
+                    logResponse = utils_1.createBaseLoggingResponse();
+                    logResponse.title = lastTitle;
+                    logResponse.titleChanged = false;
+                    return [2 /*return*/, [logResponse]];
                 }
-                else {
-                }
-                if (!(!regResultAll || regResultAll.length < 1)) return [3 /*break*/, 2];
-                return [2 /*return*/, {
-                        "buyOrderResult": undefined,
-                        "sellOrderResult": undefined,
-                        "title": lastTitle,
-                        "titleChanged": true,
-                        "error": "regex retrieval didn't find a match, or somehow returned null",
-                        "time": new Date().toLocaleDateString()
-                    }];
-            case 2:
-                if (!(regResultAll && regResultAll.length >= 1)) return [3 /*break*/, 7];
-                tradingPair = utils_1.getTradingPairsFromRegResult(regResultAll);
-                logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPair);
-                if (!tradingPair) return [3 /*break*/, 5];
-                return [4 /*yield*/, custom_methods_1.initialPurchase(tradingPair, utils_1.marketOrderAmount)];
-            case 3:
-                buyOrderResult = _a.sent();
-                logger_1.logger.info("received order result: " + buyOrderResult);
-                settledTrade = buyOrderResult.settled;
-                boughtTokenAmount = buyOrderResult.executed_value;
-                tradingPairReturn = buyOrderResult.product_id;
-                if (!settledTrade)
-                    logger_1.logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
-                return [4 /*yield*/, listing_sell_logic_1.sellLogic(boughtTokenAmount, tradingPairReturn)];
-            case 4:
-                sellOrderResult = _a.sent();
-                return [2 /*return*/, {
-                        "buyOrderResult": buyOrderResult,
-                        "sellOrderResult": sellOrderResult,
-                        "title": lastTitle,
-                        "titleChanged": true,
-                        "error": undefined,
-                        "time": new Date().toLocaleDateString() // todo add try catch here and everywhere
-                    }];
-            case 5:
-                logger_1.logger.warn('trading pair ended up undefined or had multiple matches');
-                return [2 /*return*/, {
-                        "buyOrderResult": undefined,
-                        "sellOrderResult": undefined,
-                        "title": lastTitle,
-                        "titleChanged": true,
-                        "error": 'trading pair ended up undefined',
-                        "time": new Date().toLocaleDateString() // todo add try catch here and everywhere
-                    }];
-            case 6: return [3 /*break*/, 8];
-            case 7: // can have more checks here if needed
-            return [2 /*return*/, {
-                    "buyOrderResult": undefined,
-                    "sellOrderResult": undefined,
-                    "title": lastTitle,
-                    "titleChanged": true,
-                    "error": "regex retrieval returned array with more than one element",
-                    "time": new Date().toLocaleDateString()
-                }];
-            case 8: return [3 /*break*/, 10];
-            case 9: return [2 /*return*/, {
-                    "buyOrderResult": undefined,
-                    "sellOrderResult": undefined,
-                    "title": lastTitle,
-                    "titleChanged": false,
-                    "error": undefined,
-                    "time": new Date().toLocaleDateString()
-                }];
-            case 10: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); };

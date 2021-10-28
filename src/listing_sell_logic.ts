@@ -5,7 +5,7 @@ import { placeMarketOrder } from "./api_interaction";
 import { logger } from "./logger";
 
 
-export const sellLogic = async (boughtTokenAmount: string, tradingPair: string): Promise<OrderResult> => {
+export const sellLogic = async (boughtTokenAmount: string, tradingPair: string): Promise<OrderResult> => { //todo add error checking here
     logger.info(`attempting to sell value of settled order, will first wait for 180 seconds`)
     // wait for 1 min, then immediately set a stop limit for the price at the time of the listing
     // sell 2 min after receiving an order response
