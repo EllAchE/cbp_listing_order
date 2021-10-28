@@ -10,13 +10,11 @@ import { logger } from "./logger";
 const got = require('got');
 const rss = require('rss-parser');
 
-const cronString = `0 * 23,7-23 * * *`;
-// run every minute, all hours except midnight-7am. Need to check TZ
-// also could probably ignore saturdays as possible listing date
+const cronString = `0 * 23,7-23 * * *`; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 const regPatternAllSingle = new RegExp(/(?<=\()(\w{1,10})(?=\) is now available on Coinbase)/i) // for singular item listing
 const regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,10})(?=\) are now available on Coinbase)/i) // for multiple item listing
-// const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/)
-// only runs for regular listings, can't buy on cbp when they list
+// const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/) // only runs for regular listings, can't buy on cbp when they list
+
 var lastTitle;
 
 export const cronUpdate = new CronJob(cronString, function (): void {
@@ -66,8 +64,8 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
         }
 
         if (tradingPairArray) {
+            const arr: Promise<LoggingResponse>[] = [];
             tradingPairArray.forEach(pair => {
-                const arr: Promise<LoggingResponse>[] = [];
                 arr.push(initialPurchase(pair, marketOrderAmount).then(async (buyOrderResult) => { // Not awaiting to allow earlier ordering
                     logger.info(`received order result: ${buyOrderResult}`)
                     if (!buyOrderResult.settled) logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.')
@@ -81,8 +79,12 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
                     return logResponse;
                 }))
             })
-            arr = arr.ma
-            return a
+            const returnArr: LoggingResponse[] = [];
+
+            arr.forEach(async (elem) => {
+                returnArr.push(await elem);
+            })
+            return returnArr;
         }
         else {
             logger.warn('trading pair ended up undefined/empty')

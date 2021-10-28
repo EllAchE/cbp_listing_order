@@ -45,13 +45,10 @@ var logger_1 = require("./logger");
 //const fs = require('fs');
 var got = require('got');
 var rss = require('rss-parser');
-var cronString = "0 * 23,7-23 * * *";
-// run every minute, all hours except midnight-7am. Need to check TZ
-// also could probably ignore saturdays as possible listing date
+var cronString = "0 * 23,7-23 * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 var regPatternAllSingle = new RegExp(/(?<=\()(\w{1,10})(?=\) is now available on Coinbase)/i); // for singular item listing
 var regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,10})(?=\) are now available on Coinbase)/i); // for multiple item listing
-// const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/)
-// only runs for regular listings, can't buy on cbp when they list
+// const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/) // only runs for regular listings, can't buy on cbp when they list
 var lastTitle;
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
     logger_1.logger.info("Coinbase listing cron executed at " + new Date().toLocaleString());
@@ -80,7 +77,7 @@ var getTitle = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, tradingPairArray, logResponse, logResponse, logResponse;
+    var title, tradingPairArray, logResponse, arr_1, returnArr_1, logResponse, logResponse;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, getTitle()];
@@ -105,9 +102,9 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         return [2 /*return*/, [logResponse]];
                     }
                     if (tradingPairArray) {
+                        arr_1 = [];
                         tradingPairArray.forEach(function (pair) {
-                            var arr = [];
-                            arr.push(custom_methods_1.initialPurchase(pair, utils_1.marketOrderAmount).then(function (buyOrderResult) { return __awaiter(void 0, void 0, void 0, function () {
+                            arr_1.push(custom_methods_1.initialPurchase(pair, utils_1.marketOrderAmount).then(function (buyOrderResult) { return __awaiter(void 0, void 0, void 0, function () {
                                 var sellOrderResult, logResponse;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
@@ -128,8 +125,21 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                                 });
                             }); }));
                         });
-                        arr = arr.ma;
-                        return [2 /*return*/, a];
+                        returnArr_1 = [];
+                        arr_1.forEach(function (elem) { return __awaiter(void 0, void 0, void 0, function () {
+                            var _a, _b;
+                            return __generator(this, function (_c) {
+                                switch (_c.label) {
+                                    case 0:
+                                        _b = (_a = returnArr_1).push;
+                                        return [4 /*yield*/, elem];
+                                    case 1:
+                                        _b.apply(_a, [_c.sent()]);
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        return [2 /*return*/, returnArr_1];
                     }
                     else {
                         logger_1.logger.warn('trading pair ended up undefined/empty');
