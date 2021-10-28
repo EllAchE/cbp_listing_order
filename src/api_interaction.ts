@@ -1,6 +1,7 @@
 const cbp = require('coinbase-pro');
 import { BuySellPairs, OrderBook, BuyOrSellString, TradingPair } from "./typing";
 import { AuthenticatedClient, OrderParams, OrderResult } from "coinbase-pro";
+import { logger } from "./logger";
 
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
@@ -75,7 +76,7 @@ export const cancelSingleOrder = async (orderId: string): Promise<string[]> => {
 export const getOrderBook = async (tradingPair: string, depth: number): Promise<OrderBook> => {
     return await authedClient.getProductOrderBook(tradingPair, { level: depth })
         .catch(err => {
-            console.error(err)
+            logger.error(err)
         })
 }
 
@@ -97,7 +98,7 @@ export const getTradingPairs = async (baseCoin: string, quoteCoin: string): Prom
     // getProducts returns the full list of trading pairs
     const allPairs = await authedClient.getProducts()
         .catch(err => {
-            console.error(err)
+            logger.error(err)
         });
 
     if (allPairs) {

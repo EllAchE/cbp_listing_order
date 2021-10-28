@@ -22,7 +22,7 @@
     "crypto": "^1.0.1",
     "got": "^11.8.2",
     "jest": "^27.3.0",
-    "rss-parser": "^3.12.0"
-  },
-  "devDependencies": {}
+    "rss-parser": "^3.12.0",
+    "winston": "^3.3.3"
+  }
 }

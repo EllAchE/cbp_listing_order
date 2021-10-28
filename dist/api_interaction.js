@@ -39,6 +39,7 @@ exports.__esModule = true;
 exports.getTradingPairs = exports.getBestCurrentPriceFromOrderBook = exports.getOrderBook = exports.cancelSingleOrder = exports.cancelAllOrders = exports.closePosition = exports.placeMarketOrder = exports.placeLimitOrder = void 0;
 var cbp = require('coinbase-pro');
 var typing_1 = require("./typing");
+var logger_1 = require("./logger");
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
 //const sandboxURI = 'https://api-public.sandbox.pro.coinbase.com';
@@ -118,7 +119,7 @@ var getOrderBook = function (tradingPair, depth) { return __awaiter(void 0, void
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, authedClient.getProductOrderBook(tradingPair, { level: depth })["catch"](function (err) {
-                    console.error(err);
+                    logger_1.logger.error(err);
                 })];
             case 1: return [2 /*return*/, _a.sent()];
         }
@@ -144,7 +145,7 @@ var getTradingPairs = function (baseCoin, quoteCoin) { return __awaiter(void 0, 
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, authedClient.getProducts()["catch"](function (err) {
-                    console.error(err);
+                    logger_1.logger.error(err);
                 })];
             case 1:
                 allPairs = _a.sent();

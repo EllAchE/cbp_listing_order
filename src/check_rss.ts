@@ -4,6 +4,7 @@ import { OrderResult } from "coinbase-pro";
 import { initialPurchase } from "./custom_methods";
 import { sellLogic } from "./listing_sell_logic";
 import { getTradingPairFromRegResult } from "./utils";
+import { logger } from "./logger";
 
 //const fs = require('fs');
 const got = require('got');
@@ -19,15 +20,15 @@ const regPatternAll = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coin
 var lastTitle;
 
 export const cronUpdate = new CronJob(cronString, function (): void {
-    console.log(`Coinbase listing cron executed at ${new Date().toLocaleString()}`);
+    logger.info(`Coinbase listing cron executed at ${new Date().toLocaleString()}`);
     try {
         // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
         checkFeed(lastTitle).then(logResponse => {
-            console.log(logResponse);
-        }).catch(err => console.log(err))
+            logger.info(logResponse);
+        }).catch(err => logger.error(err))
     }
     catch (err) {
-        console.log(`cron error`, err) // promise return means this catch block shouldn't be executed
+        logger.error(`cron error`, err) // promise return means this catch block shouldn't be executed
     }
 }, null, false);
 
@@ -64,7 +65,7 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
                 const boughtTokenAmount = buyOrderResult.executed_value;
                 const tradingPairReturn = buyOrderResult.product_id; // todo validate that these types are good
 
-                if (!settledTrade) console.log('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.')
+                if (!settledTrade) logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.')
 
                 const sellOrderResult: OrderResult = await sellLogic(boughtTokenAmount, tradingPairReturn);
                 return {
@@ -76,7 +77,7 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
                 };
             }
             else {
-                console.log('trading pair ended up undefined or had multiple matches')
+                logger.warn('trading pair ended up undefined or had multiple matches')
                 return {
                     "buyOrderResult": undefined,
                     "sellOrderResult": undefined,

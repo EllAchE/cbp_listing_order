@@ -41,6 +41,7 @@ var cron_1 = require("cron");
 var custom_methods_1 = require("./custom_methods");
 var listing_sell_logic_1 = require("./listing_sell_logic");
 var utils_1 = require("./utils");
+var logger_1 = require("./logger");
 //const fs = require('fs');
 var got = require('got');
 var rss = require('rss-parser');
@@ -53,15 +54,15 @@ var regPatternAll = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coinba
 // only runs for regular listings, can't buy on cbp when they list
 var lastTitle;
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
-    console.log("Coinbase listing cron executed at " + new Date().toLocaleString());
+    logger_1.logger.info("Coinbase listing cron executed at " + new Date().toLocaleString());
     try {
         // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
         checkFeed(lastTitle).then(function (logResponse) {
-            console.log(logResponse);
-        })["catch"](function (err) { return console.log(err); });
+            logger_1.logger.info(logResponse);
+        })["catch"](function (err) { return logger_1.logger.error(err); });
     }
     catch (err) {
-        console.log("cron error", err); // promise return means this catch block shouldn't be executed
+        logger_1.logger.error("cron error", err); // promise return means this catch block shouldn't be executed
     }
 }, null, false);
 var getTitle = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -105,7 +106,7 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                 boughtTokenAmount = buyOrderResult.executed_value;
                 tradingPairReturn = buyOrderResult.product_id;
                 if (!settledTrade)
-                    console.log('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
+                    logger_1.logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
                 return [4 /*yield*/, listing_sell_logic_1.sellLogic(boughtTokenAmount, tradingPairReturn)];
             case 4:
                 sellOrderResult = _a.sent();
@@ -117,7 +118,7 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         "error": undefined // todo add try catch here and everywhere
                     }];
             case 5:
-                console.log('trading pair ended up undefined or had multiple matches');
+                logger_1.logger.warn('trading pair ended up undefined or had multiple matches');
                 return [2 /*return*/, {
                         "buyOrderResult": undefined,
                         "sellOrderResult": undefined,
