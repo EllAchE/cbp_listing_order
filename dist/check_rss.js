@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.cronUpdate = void 0;
+exports.getBlogTitle = exports.cronUpdate = void 0;
 var cron_1 = require("cron");
 var utils_1 = require("./utils");
 var logger_1 = require("./logger");
@@ -45,47 +45,61 @@ var custom_methods_1 = require("./custom_methods");
 var got = require('got');
 var rss = require('rss-parser');
 var cronString = "0 * 23,7-23 * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
-var regPatternAllSingle = new RegExp(/(?<=\()(\w{1,10})(?=\) is now available on Coinbase)/i); // for singular item listing
-var regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,10})(?=\) are now available on Coinbase)/i); // for multiple item listing
-// const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/) // only runs for regular listings, can't buy on cbp when they list
 var lastTitle;
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
     logger_1.logger.info("Coinbase listing cron executed at " + new Date().toLocaleString());
     try {
         // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
-        checkFeed(lastTitle).then(function (logResponse) {
-            logger_1.logger.info(logResponse);
+        checkFeed(lastTitle).then(function (logResponses) {
+            logResponses.forEach(function (logResponse) {
+                return logger_1.logger.info(logResponse);
+            });
         })["catch"](function (err) { return logger_1.logger.error(err); });
     }
     catch (err) {
         logger_1.logger.error("cron error", err); // promise return means this catch block shouldn't be executed
     }
 }, null, false);
-var getTitle = function () { return __awaiter(void 0, void 0, void 0, function () {
+var getBlogTitle = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var feedResponse, parser, content, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, got('https://blog.coinbase.com/feed').then(function (response) {
-                    var parser = new rss();
-                    var content = parser.parseString(response.body);
-                    return content.items[0]['title']; // other option is content:encoded
-                })["catch"](function (err) {
-                    logger_1.logger.error("errror retrieving feed results", err);
-                })];
-            case 1: return [2 /*return*/, _a.sent()];
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, got('https://blog.coinbase.com/feed')];
+            case 1:
+                feedResponse = _a.sent();
+                parser = new rss();
+                return [4 /*yield*/, parser.parseString(feedResponse.body)];
+            case 2:
+                content = _a.sent();
+                logger_1.logger.info('content parsed from rss feed', content);
+                return [2 /*return*/, content.items[0]['title']]; // other option is content:encoded
+            case 3:
+                err_1 = _a.sent();
+                logger_1.logger.error("errror retrieving feed results", err_1);
+                return [2 /*return*/, undefined];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
+exports.getBlogTitle = getBlogTitle;
 var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, tradingPairArray, logResponse, logResponse;
+    var title, logResponse, tradingPairArray, logResponse, logResponse;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, getTitle()];
+            case 0: return [4 /*yield*/, exports.getBlogTitle()];
             case 1:
                 title = _a.sent();
-                if (title != lastTitle) { // execute orders here
+                if (!title) {
+                    logger_1.logger.error("errror retrieving title from feed results");
+                    logResponse = utils_1.createBaseLoggingResponse({ titleChanged: false, error: "error retrieving title from feed results", buyOrderResult: undefined, sellOrderResult: undefined });
+                    return [2 /*return*/, [logResponse]];
+                }
+                else if (title != lastTitle) { // execute orders here
                     lastTitle = title;
                     tradingPairArray = void 0;
-                    if (regPatternAllMultiple.test(title) || regPatternAllSingle.test(title)) {
+                    if (utils_1.checkIfTitleIsAllListing(title)) {
                         tradingPairArray = utils_1.getTradingPairsFromTitle(title);
                         logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPairArray);
                         return [2 /*return*/, custom_methods_1.executeTrades(tradingPairArray, lastTitle)];

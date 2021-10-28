@@ -16,8 +16,10 @@ export const cronUpdate = new CronJob(cronString, function (): void {
     logger.info(`Coinbase listing cron executed at ${new Date().toLocaleString()}`);
     try {
         // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
-        checkFeed(lastTitle).then(logResponse => {
-            logger.info(logResponse);
+        checkFeed(lastTitle).then(logResponses => {
+            logResponses.forEach(logResponse =>
+                logger.info(logResponse)
+            )
         }).catch(err => logger.error(err))
     }
     catch (err) {
@@ -25,20 +27,29 @@ export const cronUpdate = new CronJob(cronString, function (): void {
     }
 }, null, false);
 
-export const getBlogTitle = async (): Promise<string> => {
-    return await got('https://blog.coinbase.com/feed').then(response => {
+export const getBlogTitle = async (): Promise<string | undefined> => {
+    try {
+        const feedResponse = await got('https://blog.coinbase.com/feed');
         const parser = new rss();
-        const content = parser.parseString(response.body)
+        const content = await parser.parseString(feedResponse.body); // this function is async
+        logger.info('content parsed from rss feed', content)
         return content.items[0]['title']; // other option is content:encoded
-    }).catch(err => {
+    }
+    catch (err) {
         logger.error("errror retrieving feed results", err)
-    })
+        return undefined;
+    }
 }
 
 const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
     const title = await getBlogTitle();
 
-    if (title != lastTitle) { // execute orders here
+    if (!title) {
+        logger.error("errror retrieving title from feed results")
+        const logResponse = createBaseLoggingResponse({ titleChanged: false, error: "error retrieving title from feed results", buyOrderResult: undefined, sellOrderResult: undefined });
+        return [logResponse];
+    }
+    else if (title != lastTitle) { // execute orders here
         lastTitle = title;
         let tradingPairArray: string[];
 
@@ -58,3 +69,4 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
         return [logResponse];
     }
 }
+

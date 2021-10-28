@@ -4,7 +4,8 @@
   "description": "API Docs - https://docs.pro.coinbase.com/",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest ./dist/test/test.js",
+    "start": "node -r dotenv/config ./dist/check_rss_runner.js"
   },
   "repository": {
     "type": "git",

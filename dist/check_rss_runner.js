@@ -1,0 +1,5 @@
+"use strict";
+exports.__esModule = true;
+var check_rss_1 = require("./check_rss");
+check_rss_1.cronUpdate.start(); // launch the cron
+//# sourceMappingURL=check_rss_runner.js.map
