@@ -1,10 +1,8 @@
 import { LoggingResponse } from "./typing";
 import { CronJob } from 'cron';
-import { OrderResult } from "coinbase-pro";
-import { initialPurchase } from "./custom_methods";
-import { sellLogic } from "./listing_sell_logic";
-import { createBaseLoggingResponse, getTradingPairsFromTitle, marketOrderAmount } from "./utils";
+import { createBaseLoggingResponse, getTradingPairsFromTitle } from "./utils";
 import { logger } from "./logger";
+import { executeTrades } from "./custom_methods";
 
 //const fs = require('fs');
 const got = require('got');
@@ -47,27 +45,14 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
         lastTitle = title;
         let tradingPairArray: string[];
 
-        if (regPatternAllMultiple.test(title)) {
+        if (regPatternAllMultiple.test(title) || regPatternAllSingle.test(title)) {
             tradingPairArray = getTradingPairsFromTitle(title);
             logger.info(`retrieved trading pair from new title, value is ${tradingPairArray}`)
-        }
-        else if (regPatternAllSingle.test(title)) {
-            tradingPairArray = getTradingPairsFromTitle(title)
-            logger.info(`retrieved trading pair from new title, value is ${tradingPairArray}`)
+            return executeTrades(tradingPairArray, lastTitle);
         }
         else {
             logger.info("regex didn't find a match on the title, or somehow returned null. Title was", title)
             const logResponse = createBaseLoggingResponse({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
-            return [logResponse];
-        }
-
-        if (tradingPairArray) {
-            return executeTrades(tradingPairArray, lastTitle);
-        }
-        else {
-            logger.warn('trading pair ended up undefined/empty')
-
-            const logResponse = createBaseLoggingResponse({ title: lastTitle, error: 'trading pair ended up undefined', buyOrderResult: undefined, sellOrderResult: undefined });
             return [logResponse];
         }
     }
@@ -76,34 +61,3 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
         return [logResponse];
     }
 }
-function executeTrades(tradingPairArray: string[], lastTitle: string) {
-    const arr: Promise<LoggingResponse>[] = [];
-
-    tradingPairArray.forEach(pair => {
-        arr.push(initialPurchase(pair, marketOrderAmount).then(async (buyOrderResult) => { // Buy Orders/Purchases happen here
-            logger.info(`received order result: ${buyOrderResult}`);
-
-            if (!buyOrderResult.settled) logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
-            try {
-                const sellOrderResult: OrderResult = await sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id); // sell orders happen here, async
-                const logResponse = createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
-                logger.info(logResponse);
-                return logResponse;
-            }
-            catch (err) {
-                return createBaseLoggingResponse({title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: undefined, error: err})
-            }
-        }).catch(err => {
-            logger.error('error with buy order', err)
-            return createBaseLoggingResponse({title: lastTitle, buyOrderResult: undefined, sellOrderResult: undefined, error: err})
-        }));
-    });
-
-    const returnArr: LoggingResponse[] = []; // this is done just to return a logging object
-    arr.forEach(async (elem) => {
-        returnArr.push(await elem); // yhid 
-    });
-
-    return returnArr;
-}
-

@@ -38,10 +38,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.cronUpdate = void 0;
 var cron_1 = require("cron");
-var custom_methods_1 = require("./custom_methods");
-var listing_sell_logic_1 = require("./listing_sell_logic");
 var utils_1 = require("./utils");
 var logger_1 = require("./logger");
+var custom_methods_1 = require("./custom_methods");
 //const fs = require('fs');
 var got = require('got');
 var rss = require('rss-parser');
@@ -77,7 +76,7 @@ var getTitle = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, tradingPairArray, logResponse, logResponse, logResponse;
+    var title, tradingPairArray, logResponse, logResponse;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, getTitle()];
@@ -86,25 +85,14 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                 if (title != lastTitle) { // execute orders here
                     lastTitle = title;
                     tradingPairArray = void 0;
-                    if (regPatternAllMultiple.test(title)) {
+                    if (regPatternAllMultiple.test(title) || regPatternAllSingle.test(title)) {
                         tradingPairArray = utils_1.getTradingPairsFromTitle(title);
                         logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPairArray);
-                    }
-                    else if (regPatternAllSingle.test(title)) {
-                        tradingPairArray = utils_1.getTradingPairsFromTitle(title);
-                        logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPairArray);
+                        return [2 /*return*/, custom_methods_1.executeTrades(tradingPairArray, lastTitle)];
                     }
                     else {
                         logger_1.logger.info("regex didn't find a match on the title, or somehow returned null. Title was", title);
                         logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
-                        return [2 /*return*/, [logResponse]];
-                    }
-                    if (tradingPairArray) {
-                        return [2 /*return*/, executeTrades(tradingPairArray, lastTitle)];
-                    }
-                    else {
-                        logger_1.logger.warn('trading pair ended up undefined/empty');
-                        logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, error: 'trading pair ended up undefined', buyOrderResult: undefined, sellOrderResult: undefined });
                         return [2 /*return*/, [logResponse]];
                     }
                 }
@@ -116,52 +104,4 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
         }
     });
 }); };
-function executeTrades(tradingPairArray, lastTitle) {
-    var _this = this;
-    var arr = [];
-    tradingPairArray.forEach(function (pair) {
-        arr.push(custom_methods_1.initialPurchase(pair, utils_1.marketOrderAmount).then(function (buyOrderResult) { return __awaiter(_this, void 0, void 0, function () {
-            var sellOrderResult, logResponse, err_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        logger_1.logger.info("received order result: " + buyOrderResult);
-                        if (!buyOrderResult.settled)
-                            logger_1.logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, listing_sell_logic_1.sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id)];
-                    case 2:
-                        sellOrderResult = _a.sent();
-                        logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
-                        logger_1.logger.info(logResponse);
-                        return [2 /*return*/, logResponse];
-                    case 3:
-                        err_1 = _a.sent();
-                        return [2 /*return*/, utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: undefined, error: err_1 })];
-                    case 4: return [2 /*return*/];
-                }
-            });
-        }); })["catch"](function (err) {
-            logger_1.logger.error('error with buy order', err);
-            return utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: undefined, sellOrderResult: undefined, error: err });
-        }));
-    });
-    var returnArr = []; // this is done just to return a logging object
-    arr.forEach(function (elem) { return __awaiter(_this, void 0, void 0, function () {
-        var _a, _b;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    _b = (_a = returnArr).push;
-                    return [4 /*yield*/, elem];
-                case 1:
-                    _b.apply(_a, [_c.sent()]); // yhid 
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    return returnArr;
-}
 //# sourceMappingURL=check_rss.js.map
