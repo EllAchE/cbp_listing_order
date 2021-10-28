@@ -62,24 +62,7 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
         }
 
         if (tradingPairArray) {
-            const arr: Promise<LoggingResponse>[] = [];
-            tradingPairArray.forEach(pair => {
-                arr.push(initialPurchase(pair, marketOrderAmount).then(async (buyOrderResult) => { // Not awaiting to allow earlier ordering
-                    logger.info(`received order result: ${buyOrderResult}`)
-                    if (!buyOrderResult.settled) logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.')
-                    const sellOrderResult: OrderResult = await sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id);
-
-                    const logResponse = createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
-                    logger.info(logResponse)
-                    return logResponse;
-                }))
-            })
-            const returnArr: LoggingResponse[] = [];
-
-            arr.forEach(async (elem) => {
-                returnArr.push(await elem);
-            })
-            return returnArr;
+            return executeTrades(tradingPairArray, lastTitle);
         }
         else {
             logger.warn('trading pair ended up undefined/empty')
@@ -93,3 +76,34 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
         return [logResponse];
     }
 }
+function executeTrades(tradingPairArray: string[], lastTitle: string) {
+    const arr: Promise<LoggingResponse>[] = [];
+
+    tradingPairArray.forEach(pair => {
+        arr.push(initialPurchase(pair, marketOrderAmount).then(async (buyOrderResult) => { // Buy Orders/Purchases happen here
+            logger.info(`received order result: ${buyOrderResult}`);
+
+            if (!buyOrderResult.settled) logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
+            try {
+                const sellOrderResult: OrderResult = await sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id); // sell orders happen here, async
+                const logResponse = createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
+                logger.info(logResponse);
+                return logResponse;
+            }
+            catch (err) {
+                return createBaseLoggingResponse({title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: undefined, error: err})
+            }
+        }).catch(err => {
+            logger.error('error with buy order', err)
+            return createBaseLoggingResponse({title: lastTitle, buyOrderResult: undefined, sellOrderResult: undefined, error: err})
+        }));
+    });
+
+    const returnArr: LoggingResponse[] = []; // this is done just to return a logging object
+    arr.forEach(async (elem) => {
+        returnArr.push(await elem); // yhid 
+    });
+
+    return returnArr;
+}
+

@@ -77,7 +77,7 @@ var getTitle = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, tradingPairArray, logResponse, arr_1, returnArr_1, logResponse, logResponse;
+    var title, tradingPairArray, logResponse, logResponse, logResponse;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, getTitle()];
@@ -100,41 +100,7 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         return [2 /*return*/, [logResponse]];
                     }
                     if (tradingPairArray) {
-                        arr_1 = [];
-                        tradingPairArray.forEach(function (pair) {
-                            arr_1.push(custom_methods_1.initialPurchase(pair, utils_1.marketOrderAmount).then(function (buyOrderResult) { return __awaiter(void 0, void 0, void 0, function () {
-                                var sellOrderResult, logResponse;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            logger_1.logger.info("received order result: " + buyOrderResult);
-                                            if (!buyOrderResult.settled)
-                                                logger_1.logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
-                                            return [4 /*yield*/, listing_sell_logic_1.sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id)];
-                                        case 1:
-                                            sellOrderResult = _a.sent();
-                                            logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
-                                            logger_1.logger.info(logResponse);
-                                            return [2 /*return*/, logResponse];
-                                    }
-                                });
-                            }); }));
-                        });
-                        returnArr_1 = [];
-                        arr_1.forEach(function (elem) { return __awaiter(void 0, void 0, void 0, function () {
-                            var _a, _b;
-                            return __generator(this, function (_c) {
-                                switch (_c.label) {
-                                    case 0:
-                                        _b = (_a = returnArr_1).push;
-                                        return [4 /*yield*/, elem];
-                                    case 1:
-                                        _b.apply(_a, [_c.sent()]);
-                                        return [2 /*return*/];
-                                }
-                            });
-                        }); });
-                        return [2 /*return*/, returnArr_1];
+                        return [2 /*return*/, executeTrades(tradingPairArray, lastTitle)];
                     }
                     else {
                         logger_1.logger.warn('trading pair ended up undefined/empty');
@@ -150,4 +116,52 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
         }
     });
 }); };
+function executeTrades(tradingPairArray, lastTitle) {
+    var _this = this;
+    var arr = [];
+    tradingPairArray.forEach(function (pair) {
+        arr.push(custom_methods_1.initialPurchase(pair, utils_1.marketOrderAmount).then(function (buyOrderResult) { return __awaiter(_this, void 0, void 0, function () {
+            var sellOrderResult, logResponse, err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        logger_1.logger.info("received order result: " + buyOrderResult);
+                        if (!buyOrderResult.settled)
+                            logger_1.logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, listing_sell_logic_1.sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id)];
+                    case 2:
+                        sellOrderResult = _a.sent();
+                        logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
+                        logger_1.logger.info(logResponse);
+                        return [2 /*return*/, logResponse];
+                    case 3:
+                        err_1 = _a.sent();
+                        return [2 /*return*/, utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: undefined, error: err_1 })];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        }); })["catch"](function (err) {
+            logger_1.logger.error('error with buy order', err);
+            return utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: undefined, sellOrderResult: undefined, error: err });
+        }));
+    });
+    var returnArr = []; // this is done just to return a logging object
+    arr.forEach(function (elem) { return __awaiter(_this, void 0, void 0, function () {
+        var _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    _b = (_a = returnArr).push;
+                    return [4 /*yield*/, elem];
+                case 1:
+                    _b.apply(_a, [_c.sent()]); // yhid 
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    return returnArr;
+}
 //# sourceMappingURL=check_rss.js.map
