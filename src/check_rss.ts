@@ -3,7 +3,7 @@ import { CronJob } from 'cron';
 import { OrderResult } from "coinbase-pro";
 import { initialPurchase } from "./custom_methods";
 import { sellLogic } from "./listing_sell_logic";
-import { getTradingPairFromRegResult, marketOrderAmount } from "./utils";
+import { getTradingPairsFromRegResult, marketOrderAmount } from "./utils";
 import { logger } from "./logger";
 
 //const fs = require('fs');
@@ -13,7 +13,8 @@ const rss = require('rss-parser');
 const cronString = `0 * 23,7-23 * * *`;
 // run every minute, all hours except midnight-7am. Need to check TZ
 // also could probably ignore saturdays as possible listing date
-const regPatternAll = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coinbase)/)
+const regPatternAllSingle = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coinbase)/) // for singular item listing
+const regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,5})(?=\) are now available on Coinbase)/) // for multiple item listing
 // const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/)
 // only runs for regular listings, can't buy on cbp when they list
 var lastTitle;
@@ -46,7 +47,19 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
 
     if (title != lastTitle) { // execute orders here
         lastTitle = title;
-        const regResultAll = regPatternAll.exec(title);
+        const isMultipleListing: boolean = regPatternAllSingle.test(title);
+        const isSingleListing: boolean = regPatternAllMultiple.test(title); // slightly suboptimal as a yes on the isMultiple would preclude need for further regex
+
+        let regResultAll
+        if (isSingleListing) {
+            regResultAll = regPatternAllSingle.exec(title);
+        }
+        else if (isMultipleListing) {
+            regResultAll = regPatternAllMultiple.exec(title);
+        }
+        else {
+
+        }
 
         if (!regResultAll || regResultAll.length < 1) { // can have more checks here if needed
             return {
@@ -58,8 +71,8 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
                 "time": new Date().toLocaleDateString()
             }
         }
-        else if (regResultAll && regResultAll.length === 1) { // will be null if nothing matches
-            const tradingPair = getTradingPairFromRegResult(regResultAll); // Assuming everything has a USD pair on cbp, seems to be
+        else if (regResultAll && regResultAll.length >= 1) { // will be null if nothing matches
+            const tradingPair = getTradingPairsFromRegResult(regResultAll); // Assuming everything has a USD pair on cbp, seems to be
             logger.info(`retrieved trading pair from new title, value is ${tradingPair}`)
 
             if (tradingPair) {

@@ -1,8 +1,8 @@
 "use strict";
 exports.__esModule = true;
-exports.marketOrderAmount = exports.getTradingPairFromRegResult = void 0;
+exports.marketOrderAmount = exports.getTradingPairsFromRegResult = void 0;
 var logger_1 = require("./logger");
-var getTradingPairFromRegResult = function (regArray) {
+var getTradingPairsFromRegResult = function (regArray) {
     var firstMatch = regArray[0];
     var cbpPairReg = /.{5}/i;
     if (cbpPairReg.test(firstMatch)) {
@@ -14,6 +14,6 @@ var getTradingPairFromRegResult = function (regArray) {
     }
     return undefined;
 };
-exports.getTradingPairFromRegResult = getTradingPairFromRegResult;
+exports.getTradingPairsFromRegResult = getTradingPairsFromRegResult;
 exports.marketOrderAmount = '100'; // must be a string for api methods
 //# sourceMappingURL=utils.js.map

@@ -48,7 +48,8 @@ var rss = require('rss-parser');
 var cronString = "0 * 23,7-23 * * *";
 // run every minute, all hours except midnight-7am. Need to check TZ
 // also could probably ignore saturdays as possible listing date
-var regPatternAll = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coinbase)/);
+var regPatternAllSingle = new RegExp(/(?<=\()(\w{1,5})(?=\) is now available on Coinbase)/); // for singular item listing
+var regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,5})(?=\) are now available on Coinbase)/); // for multiple item listing
 // const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/)
 // only runs for regular listings, can't buy on cbp when they list
 var lastTitle;
@@ -79,7 +80,7 @@ var getTitle = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, regResultAll, tradingPair, buyOrderResult, settledTrade, boughtTokenAmount, tradingPairReturn, sellOrderResult;
+    var title, isMultipleListing, isSingleListing, regResultAll, tradingPair, buyOrderResult, settledTrade, boughtTokenAmount, tradingPairReturn, sellOrderResult;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, getTitle()];
@@ -87,7 +88,17 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                 title = _a.sent();
                 if (!(title != lastTitle)) return [3 /*break*/, 9];
                 lastTitle = title;
-                regResultAll = regPatternAll.exec(title);
+                isMultipleListing = regPatternAllSingle.test(title);
+                isSingleListing = regPatternAllMultiple.test(title);
+                regResultAll = void 0;
+                if (isSingleListing) {
+                    regResultAll = regPatternAllSingle.exec(title);
+                }
+                else if (isMultipleListing) {
+                    regResultAll = regPatternAllMultiple.exec(title);
+                }
+                else {
+                }
                 if (!(!regResultAll || regResultAll.length < 1)) return [3 /*break*/, 2];
                 return [2 /*return*/, {
                         "buyOrderResult": undefined,
@@ -98,8 +109,8 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         "time": new Date().toLocaleDateString()
                     }];
             case 2:
-                if (!(regResultAll && regResultAll.length === 1)) return [3 /*break*/, 7];
-                tradingPair = utils_1.getTradingPairFromRegResult(regResultAll);
+                if (!(regResultAll && regResultAll.length >= 1)) return [3 /*break*/, 7];
+                tradingPair = utils_1.getTradingPairsFromRegResult(regResultAll);
                 logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPair);
                 if (!tradingPair) return [3 /*break*/, 5];
                 return [4 /*yield*/, custom_methods_1.initialPurchase(tradingPair, utils_1.marketOrderAmount)];

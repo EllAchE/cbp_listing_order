@@ -1,6 +1,6 @@
 import { logger } from "./logger";
 
-export const getTradingPairFromRegResult = (regArray: RegExpExecArray): string | undefined => {
+export const getTradingPairsFromRegResult = (regArray: RegExpExecArray): string[] | undefined => {
     const firstMatch = regArray[0];
     const cbpPairReg = /.{5}/i
 
