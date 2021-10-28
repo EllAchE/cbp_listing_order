@@ -39,3 +39,4 @@ warn: extracted regex value didn't pass the next layer of validation {"timestamp
 warn: the title was ARPA Chain ARPA), Bounce (AUCTION and Perpetual Protocol ( PERP) are launching on Coinbase Pro {"timestamp":"2021-10-28T05:50:45.254Z"}
 warn: extracted regex value didn't pass the next layer of validation {"timestamp":"2021-10-28T05:50:45.254Z"}
 warn: the title was  {"timestamp":"2021-10-28T05:50:45.254Z"}
+info: Launching coinbase monitoring cronjob {"timestamp":"2021-10-28T05:55:17.008Z"}
