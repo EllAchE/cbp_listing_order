@@ -1,5 +1,8 @@
 import { cronUpdate } from "./check_rss";
 import { logger } from "./logger";
 
-logger.info('Launching coinbase monitoring cronjob', new Date().toLocaleDateString())
-cronUpdate.start() // launch the cron
+if (!process.env.key || !process.env.passphrase || !process.env.secret) logger.error('missing secret, passphrase or key. Exiting execution')
+else {
+    logger.info('Launching coinbase monitoring cronjob', new Date().toLocaleDateString())
+    cronUpdate.start() // launch the cron
+}
