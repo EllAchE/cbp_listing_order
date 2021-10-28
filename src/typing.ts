@@ -41,4 +41,5 @@ export interface LoggingResponse {
     title: string
     titleChanged: boolean
     error: string | undefined
+    time: string
 }

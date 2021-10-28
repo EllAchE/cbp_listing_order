@@ -56,13 +56,15 @@ var createLimitOrder = function (price, amount, tradingPair, side) {
     };
 };
 var createMarketOrder = function (amount, tradingPair, side) {
-    return {
+    var orderParams = {
         type: "market",
         side: side,
         funds: amount,
         size: amount,
         product_id: tradingPair
     };
+    logger_1.logger.info('order params are', orderParams);
+    return orderParams;
 };
 var placeLimitOrder = function (isBuy, price, amount, tradingPair) { return __awaiter(void 0, void 0, void 0, function () {
     var orderParams, orderParams;
@@ -82,6 +84,7 @@ exports.placeLimitOrder = placeLimitOrder;
 var placeMarketOrder = function (isBuy, amount, tradingPair) { return __awaiter(void 0, void 0, void 0, function () {
     var orderParams, orderParams;
     return __generator(this, function (_a) {
+        logger_1.logger.info("attempting to place market order with args isBuy " + isBuy + ", amount " + amount + ", tradingPair " + tradingPair);
         if (isBuy) {
             orderParams = createMarketOrder(amount, tradingPair, typing_1.BuyOrSellString.Buy);
             return [2 /*return*/, authedClient.buy(orderParams)]; // returns a promise

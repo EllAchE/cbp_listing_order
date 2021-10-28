@@ -39,10 +39,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.sellLogic = void 0;
 var api_interaction_1 = require("./api_interaction");
+var logger_1 = require("./logger");
 var sellLogic = function (boughtTokenAmount, tradingPair) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                logger_1.logger.info("attempting to sell value of settled order, will first wait for 180 seconds");
                 // wait for 1 min, then immediately set a stop limit for the price at the time of the listing
                 // sell 2 min after receiving an order response
                 // sell after 5 min no matter what
@@ -51,9 +53,9 @@ var sellLogic = function (boughtTokenAmount, tradingPair) { return __awaiter(voi
                     Options are: Stop Limit, Limit, Market after time, constantly rising limit (trailing limit)
                 */
                 sleep(180); // poor implementation of await, but setTimeout return type is weird
+                logger_1.logger.info("Waited for 180 seconds. Attempting to sell.");
                 return [4 /*yield*/, api_interaction_1.placeMarketOrder(false, boughtTokenAmount, tradingPair)];
-            case 1: // poor implementation of await, but setTimeout return type is weird
-            return [2 /*return*/, _a.sent()];
+            case 1: return [2 /*return*/, _a.sent()];
         }
     });
 }); };

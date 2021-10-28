@@ -37,6 +37,8 @@ const getTitle = async (): Promise<string> => {
         const parser = new rss();
         const content = parser.parseString(response.body)
         return content.items[0]['title']; // other option is content:encoded
+    }).catch(err => {
+        logger.error("errror retrieving feed results", err)
     })
 }
 
@@ -53,13 +55,17 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
                 "sellOrderResult": undefined,
                 "title": lastTitle,
                 "titleChanged": true,
-                "error": "regex retrieval didn't find a match, or somehow returned null"
+                "error": "regex retrieval didn't find a match, or somehow returned null",
+                "time": new Date().toLocaleDateString()
             }
         }
         else if (regResultAll && regResultAll.length === 1) { // will be null if nothing matches
             const tradingPair = getTradingPairFromRegResult(regResultAll); // Assuming everything has a USD pair on cbp, seems to be
+            logger.info(`retrieved trading pair from new title, value is ${tradingPair}`)
+
             if (tradingPair) {
                 const buyOrderResult: OrderResult = await initialPurchase(tradingPair, marketOrderAmount);
+                logger.info(`received order result: ${buyOrderResult}`)
 
                 const settledTrade = buyOrderResult.settled;
                 const boughtTokenAmount = buyOrderResult.executed_value;
@@ -73,7 +79,8 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
                     "sellOrderResult": sellOrderResult,
                     "title": lastTitle,
                     "titleChanged": true,
-                    "error": undefined // todo add try catch here and everywhere
+                    "error": undefined,
+                    "time": new Date().toLocaleDateString() // todo add try catch here and everywhere
                 };
             }
             else {
@@ -83,7 +90,8 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
                     "sellOrderResult": undefined,
                     "title": lastTitle,
                     "titleChanged": true,
-                    "error": 'trading pair ended up undefined' // todo add try catch here and everywhere
+                    "error": 'trading pair ended up undefined',
+                    "time": new Date().toLocaleDateString() // todo add try catch here and everywhere
                 };
             }
 
@@ -94,7 +102,8 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
                 "sellOrderResult": undefined,
                 "title": lastTitle,
                 "titleChanged": true,
-                "error": "regex retrieval returned array with more than one element"
+                "error": "regex retrieval returned array with more than one element",
+                "time": new Date().toLocaleDateString()
             }
         }
     }
@@ -105,7 +114,8 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse> => {
             "sellOrderResult": undefined,
             "title": lastTitle,
             "titleChanged": false,
-            "error": undefined
+            "error": undefined,
+            "time": new Date().toLocaleDateString()
         }
     }
 }

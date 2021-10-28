@@ -27,13 +27,16 @@ const createLimitOrder = (price: string, amount: string, tradingPair: string, si
 }
 
 const createMarketOrder = (amount: string, tradingPair: string, side: BuyOrSellString): OrderParams => { // same params for buy and sell
-    return {
+    const orderParams: OrderParams = {
         type: "market",
         side: side,
         funds: amount, // same as size
         size: amount, // amount of BTC to buy
         product_id: tradingPair, // first item is what's being bought, second item is what's being spent
     };
+    logger.info('order params are', orderParams);
+
+    return orderParams;
 }
 
 export const placeLimitOrder = async (isBuy: boolean, price: string, amount: string, tradingPair: string): Promise<OrderResult> => {
@@ -48,6 +51,7 @@ export const placeLimitOrder = async (isBuy: boolean, price: string, amount: str
 }
 
 export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPair: string): Promise<OrderResult> => {
+    logger.info(`attempting to place market order with args isBuy ${isBuy}, amount ${amount}, tradingPair ${tradingPair}`)
     if (isBuy) {
         const orderParams = createMarketOrder(amount, tradingPair, BuyOrSellString.Buy)
         return authedClient.buy(orderParams) // returns a promise

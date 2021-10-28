@@ -72,6 +72,8 @@ var getTitle = function () { return __awaiter(void 0, void 0, void 0, function (
                     var parser = new rss();
                     var content = parser.parseString(response.body);
                     return content.items[0]['title']; // other option is content:encoded
+                })["catch"](function (err) {
+                    logger_1.logger.error("errror retrieving feed results", err);
                 })];
             case 1: return [2 /*return*/, _a.sent()];
         }
@@ -93,15 +95,18 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         "sellOrderResult": undefined,
                         "title": lastTitle,
                         "titleChanged": true,
-                        "error": "regex retrieval didn't find a match, or somehow returned null"
+                        "error": "regex retrieval didn't find a match, or somehow returned null",
+                        "time": new Date().toLocaleDateString()
                     }];
             case 2:
                 if (!(regResultAll && regResultAll.length === 1)) return [3 /*break*/, 7];
                 tradingPair = utils_1.getTradingPairFromRegResult(regResultAll);
+                logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPair);
                 if (!tradingPair) return [3 /*break*/, 5];
                 return [4 /*yield*/, custom_methods_1.initialPurchase(tradingPair, marketOrderAmount)];
             case 3:
                 buyOrderResult = _a.sent();
+                logger_1.logger.info("received order result: " + buyOrderResult);
                 settledTrade = buyOrderResult.settled;
                 boughtTokenAmount = buyOrderResult.executed_value;
                 tradingPairReturn = buyOrderResult.product_id;
@@ -115,7 +120,8 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         "sellOrderResult": sellOrderResult,
                         "title": lastTitle,
                         "titleChanged": true,
-                        "error": undefined // todo add try catch here and everywhere
+                        "error": undefined,
+                        "time": new Date().toLocaleDateString() // todo add try catch here and everywhere
                     }];
             case 5:
                 logger_1.logger.warn('trading pair ended up undefined or had multiple matches');
@@ -124,7 +130,8 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         "sellOrderResult": undefined,
                         "title": lastTitle,
                         "titleChanged": true,
-                        "error": 'trading pair ended up undefined' // todo add try catch here and everywhere
+                        "error": 'trading pair ended up undefined',
+                        "time": new Date().toLocaleDateString() // todo add try catch here and everywhere
                     }];
             case 6: return [3 /*break*/, 8];
             case 7: // can have more checks here if needed
@@ -133,7 +140,8 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                     "sellOrderResult": undefined,
                     "title": lastTitle,
                     "titleChanged": true,
-                    "error": "regex retrieval returned array with more than one element"
+                    "error": "regex retrieval returned array with more than one element",
+                    "time": new Date().toLocaleDateString()
                 }];
             case 8: return [3 /*break*/, 10];
             case 9: return [2 /*return*/, {
@@ -141,7 +149,8 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                     "sellOrderResult": undefined,
                     "title": lastTitle,
                     "titleChanged": false,
-                    "error": undefined
+                    "error": undefined,
+                    "time": new Date().toLocaleDateString()
                 }];
             case 10: return [2 /*return*/];
         }
