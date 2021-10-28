@@ -45,7 +45,6 @@ var logger_1 = require("./logger");
 //const fs = require('fs');
 var got = require('got');
 var rss = require('rss-parser');
-var marketOrderAmount = '100'; // must be a string for api methods
 var cronString = "0 * 23,7-23 * * *";
 // run every minute, all hours except midnight-7am. Need to check TZ
 // also could probably ignore saturdays as possible listing date
@@ -103,7 +102,7 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                 tradingPair = utils_1.getTradingPairFromRegResult(regResultAll);
                 logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPair);
                 if (!tradingPair) return [3 /*break*/, 5];
-                return [4 /*yield*/, custom_methods_1.initialPurchase(tradingPair, marketOrderAmount)];
+                return [4 /*yield*/, custom_methods_1.initialPurchase(tradingPair, utils_1.marketOrderAmount)];
             case 3:
                 buyOrderResult = _a.sent();
                 logger_1.logger.info("received order result: " + buyOrderResult);

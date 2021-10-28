@@ -3,14 +3,13 @@ import { CronJob } from 'cron';
 import { OrderResult } from "coinbase-pro";
 import { initialPurchase } from "./custom_methods";
 import { sellLogic } from "./listing_sell_logic";
-import { getTradingPairFromRegResult } from "./utils";
+import { getTradingPairFromRegResult, marketOrderAmount } from "./utils";
 import { logger } from "./logger";
 
 //const fs = require('fs');
 const got = require('got');
 const rss = require('rss-parser');
 
-const marketOrderAmount = '100' // must be a string for api methods
 const cronString = `0 * 23,7-23 * * *`;
 // run every minute, all hours except midnight-7am. Need to check TZ
 // also could probably ignore saturdays as possible listing date

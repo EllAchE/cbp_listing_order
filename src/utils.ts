@@ -14,3 +14,5 @@ export const getTradingPairFromRegResult = (regArray: RegExpExecArray): string |
 
     return undefined;
 }
+
+export const marketOrderAmount = '100' // must be a string for api methods

@@ -47,7 +47,7 @@ function initialPurchase(tradingPair, marketOrderAmount) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, api_interaction_1.placeMarketOrder(true, marketOrderAmount, tradingPair)];
-                case 1: return [2 /*return*/, _a.sent()]; // naive implementation, immediate market order of $3000
+                case 1: return [2 /*return*/, _a.sent()]; // naive implementation, immediate market order of specified amount
             }
         });
     });

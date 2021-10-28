@@ -7,5 +7,5 @@ import { placeMarketOrder } from "./api_interaction";
 // }
 
 export async function initialPurchase(tradingPair: string, marketOrderAmount: string): Promise<OrderResult> {
-    return await placeMarketOrder(true, marketOrderAmount, tradingPair); // naive implementation, immediate market order of $3000
+    return await placeMarketOrder(true, marketOrderAmount, tradingPair); // naive implementation, immediate market order of specified amount
 }
