@@ -45,7 +45,7 @@ var logger_1 = require("./logger");
 //const fs = require('fs');
 var got = require('got');
 var rss = require('rss-parser');
-var marketOrderAmount = '3000'; // must be a string for api methods
+var marketOrderAmount = '100'; // must be a string for api methods
 var cronString = "0 * 23,7-23 * * *";
 // run every minute, all hours except midnight-7am. Need to check TZ
 // also could probably ignore saturdays as possible listing date

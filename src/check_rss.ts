@@ -10,7 +10,7 @@ import { logger } from "./logger";
 const got = require('got');
 const rss = require('rss-parser');
 
-const marketOrderAmount = '3000' // must be a string for api methods
+const marketOrderAmount = '100' // must be a string for api methods
 const cronString = `0 * 23,7-23 * * *`;
 // run every minute, all hours except midnight-7am. Need to check TZ
 // also could probably ignore saturdays as possible listing date
