@@ -44,7 +44,7 @@ var custom_methods_1 = require("./custom_methods");
 //const fs = require('fs');
 //const got = require('got');
 var rss = require('rss-parser');
-var cronString = "*/10 * 23,7-23 * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
+var cronString = "*/5 * 23,7-23 * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 var lastTitle;
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
     logger_1.logger.info("Coinbase listing cron executed at " + new Date().toLocaleString());
@@ -61,7 +61,7 @@ exports.cronUpdate = new cron_1.CronJob(cronString, function () {
     }
 }, null, false);
 var getBlogTitle = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var parser, content, theItem, theTitle2, theTitle, err_1;
+    var parser, feed, title, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -69,14 +69,10 @@ var getBlogTitle = function () { return __awaiter(void 0, void 0, void 0, functi
                 parser = new rss();
                 return [4 /*yield*/, parser.parseURL('https://blog.coinbase.com/feed')];
             case 1:
-                content = _a.sent();
-                theItem = content.items[0];
-                logger_1.logger.info('content parsed from rss feed', theItem);
-                theTitle2 = theItem.title;
-                theTitle = theItem["title"];
-                logger_1.logger.info('title parsed from rss feed', theTitle2);
-                logger_1.logger.info('title parsed from rss feed', theTitle);
-                return [2 /*return*/, theTitle2]; // other option is content:encoded
+                feed = _a.sent();
+                title = feed.items[0].title;
+                logger_1.logger.info("title parsed from rss feed " + title);
+                return [2 /*return*/, title]; // other option is content:encoded
             case 2:
                 err_1 = _a.sent();
                 logger_1.logger.error("errror retrieving feed results", err_1);

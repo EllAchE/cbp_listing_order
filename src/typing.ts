@@ -49,5 +49,11 @@ export interface Feed {
 }
 
 export interface Item {
-    title: string
+    title: string,
+    creator: string,
+    guid: string,
+    link: string,
+    pubDate: string,
+    timestamp: string,
+    isoDate: string
 }
