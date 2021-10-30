@@ -32,7 +32,7 @@ export const getBlogTitle = async (): Promise<string | undefined> => {
         const feedResponse = await got('https://blog.coinbase.com/feed');
         const parser = new rss();
         const content = await parser.parseString(feedResponse.body); // this function is async
-        logger.info('content parsed from rss feed', content)
+        logger.info('title parsed from rss feed', content.items[0]['title'])
         return content.items[0]['title']; // other option is content:encoded
     }
     catch (err) {

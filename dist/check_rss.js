@@ -73,7 +73,7 @@ var getBlogTitle = function () { return __awaiter(void 0, void 0, void 0, functi
                 return [4 /*yield*/, parser.parseString(feedResponse.body)];
             case 2:
                 content = _a.sent();
-                logger_1.logger.info('content parsed from rss feed', content);
+                logger_1.logger.info('title parsed from rss feed', content.items[0]['title']);
                 return [2 /*return*/, content.items[0]['title']]; // other option is content:encoded
             case 3:
                 err_1 = _a.sent();
