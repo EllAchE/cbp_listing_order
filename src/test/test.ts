@@ -59,6 +59,6 @@ describe('Should get latest blog title', () => {
     it('Should get latest blog title', async () => {
         const title = await getBlogTitle()
         console.log(title)
-        assert.equal("string", typeof title)
+        assert.equal("string", typeof title) // this test is bad, needs to look for nonempty
     })
 })

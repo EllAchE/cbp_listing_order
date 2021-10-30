@@ -43,3 +43,11 @@ export interface LoggingResponse {
     error: string | undefined
     time: string
 }
+
+export interface Feed {
+    items: Item[]
+}
+
+export interface Item {
+    title: string
+}

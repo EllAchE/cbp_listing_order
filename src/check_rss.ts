@@ -1,14 +1,15 @@
-import { LoggingResponse } from "./typing";
+import { Feed, Item, LoggingResponse } from "./typing";
 import { CronJob } from 'cron';
 import { checkIfTitleIsAllListing, createBaseLoggingResponse, getTradingPairsFromTitle } from "./utils";
 import { logger } from "./logger";
 import { executeTrades } from "./custom_methods";
+import Parser = require("rss-parser");
 
 //const fs = require('fs');
-const got = require('got');
+//const got = require('got');
 const rss = require('rss-parser');
 
-const cronString = `0 * 23,7-23 * * *`; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
+const cronString = `*/10 * 23,7-23 * * *`; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 
 var lastTitle;
 
@@ -18,7 +19,7 @@ export const cronUpdate = new CronJob(cronString, function (): void {
         // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
         checkFeed(lastTitle).then(logResponses => {
             logResponses.forEach(logResponse =>
-                logger.info(logResponse)
+                logger.info(logResponse.toString())
             )
         }).catch(err => logger.error(err))
     }
@@ -29,11 +30,17 @@ export const cronUpdate = new CronJob(cronString, function (): void {
 
 export const getBlogTitle = async (): Promise<string | undefined> => {
     try {
-        const feedResponse = await got('https://blog.coinbase.com/feed');
-        const parser = new rss();
-        const content = await parser.parseString(feedResponse.body); // this function is async
-        logger.info('title parsed from rss feed', content.items[0]['title'])
-        return content.items[0]['title']; // other option is content:encoded
+        //const feedResponse = await got('https://blog.coinbase.com/feed');
+        const parser: Parser<Feed, Item> = new rss();
+        const content: Feed = await parser.parseURL('https://blog.coinbase.com/feed'); // this function is async
+        const theItem = content.items[0];
+        logger.info('content parsed from rss feed', theItem)
+        const theTitle2 = theItem.title
+        const theTitle = theItem["title"]
+
+        logger.info('title parsed from rss feed', theTitle2)
+        logger.info('title parsed from rss feed', theTitle)
+        return theTitle2; // other option is content:encoded
     }
     catch (err) {
         logger.error("errror retrieving feed results", err)

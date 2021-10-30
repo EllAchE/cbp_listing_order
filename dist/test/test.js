@@ -88,7 +88,7 @@ describe('Should get latest blog title', function () {
                 case 1:
                     title = _a.sent();
                     console.log(title);
-                    assert.equal("string", typeof title);
+                    assert.equal("string", typeof title); // this test is bad, needs to look for nonempty
                     return [2 /*return*/];
             }
         });
