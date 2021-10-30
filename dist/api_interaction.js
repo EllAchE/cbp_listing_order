@@ -63,7 +63,7 @@ var createMarketOrder = function (amount, tradingPair, side) {
         size: amount,
         product_id: tradingPair
     };
-    logger_1.logger.info('order params are', orderParams);
+    logger_1.logger.info("order params are " + orderParams);
     return orderParams;
 };
 var placeLimitOrder = function (isBuy, price, amount, tradingPair) { return __awaiter(void 0, void 0, void 0, function () {

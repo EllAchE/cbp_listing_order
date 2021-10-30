@@ -62,7 +62,7 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
             return executeTrades(tradingPairArray, lastTitle);
         }
         else {
-            logger.info("regex didn't find a match on the title, or somehow returned null. Title was", title)
+            logger.info(`regex didn't find a match on the title, or somehow returned null. Title was ${title}`)
             const logResponse = createBaseLoggingResponse({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
             return [logResponse];
         }

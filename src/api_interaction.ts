@@ -34,7 +34,7 @@ const createMarketOrder = (amount: string, tradingPair: string, side: BuyOrSellS
         size: amount, // amount of BTC to buy
         product_id: tradingPair, // first item is what's being bought, second item is what's being spent
     };
-    logger.info('order params are', orderParams);
+    logger.info(`order params are ${orderParams}`);
 
     return orderParams;
 }

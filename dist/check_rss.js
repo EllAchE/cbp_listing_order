@@ -103,7 +103,7 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                         return [2 /*return*/, custom_methods_1.executeTrades(tradingPairArray, lastTitle)];
                     }
                     else {
-                        logger_1.logger.info("regex didn't find a match on the title, or somehow returned null. Title was", title);
+                        logger_1.logger.info("regex didn't find a match on the title, or somehow returned null. Title was " + title);
                         logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
                         return [2 /*return*/, [logResponse]];
                     }
