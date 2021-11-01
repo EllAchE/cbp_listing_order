@@ -44,15 +44,15 @@ var custom_methods_1 = require("./custom_methods");
 //const fs = require('fs');
 //const got = require('got');
 var rss = require('rss-parser');
-var cronString = "0 * * * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 var lastTitle;
+var cronString = "0 * * * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
     logger_1.logger.info("Coinbase listing cron executed at " + new Date().toLocaleString());
     try {
         // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
         checkFeed(lastTitle).then(function (logResponses) {
             logResponses.forEach(function (logResponse) {
-                return logger_1.logger.info(logResponse.toString());
+                logger_1.logger.info(JSON.stringify(logResponse));
             });
         })["catch"](function (err) { return logger_1.logger.error(err); });
     }
@@ -86,34 +86,60 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
     var title, logResponse, tradingPairArray, logResponse, logResponse;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, exports.getBlogTitle)()];
+            case 0: return [4 /*yield*/, exports.getBlogTitle()];
             case 1:
                 title = _a.sent();
                 if (!title) {
                     logger_1.logger.error("errror retrieving title from feed results");
-                    logResponse = (0, utils_1.createBaseLoggingResponse)({ titleChanged: false, error: "error retrieving title from feed results", buyOrderResult: undefined, sellOrderResult: undefined });
+                    logResponse = utils_1.createBaseLoggingResponse({ titleChanged: false, error: "error retrieving title from feed results", buyOrderResult: undefined, sellOrderResult: undefined });
                     return [2 /*return*/, [logResponse]];
                 }
                 else if (title != lastTitle) { // execute orders here
+                    logger_1.logger.info("title changed! It used to be " + lastTitle + ", now it is " + title);
                     lastTitle = title;
                     tradingPairArray = void 0;
-                    if ((0, utils_1.checkIfTitleIsAllListing)(title)) {
-                        tradingPairArray = (0, utils_1.getTradingPairsFromTitle)(title);
+                    if (utils_1.checkIfTitleIsAllListing(title)) {
+                        tradingPairArray = utils_1.getTradingPairsFromTitle(title);
                         logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPairArray);
-                        return [2 /*return*/, (0, custom_methods_1.executeTrades)(tradingPairArray, lastTitle)];
+                        return [2 /*return*/, custom_methods_1.executeTrades(tradingPairArray, lastTitle)];
                     }
                     else {
                         logger_1.logger.info("regex didn't find a match on the title, or somehow returned null. Title was " + title);
-                        logResponse = (0, utils_1.createBaseLoggingResponse)({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
+                        logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
                         return [2 /*return*/, [logResponse]];
                     }
                 }
                 else { // can have more checks here if needed
-                    logResponse = (0, utils_1.createBaseLoggingResponse)({ title: lastTitle, titleChanged: false, error: undefined, buyOrderResult: undefined, sellOrderResult: undefined });
+                    logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, titleChanged: false, error: undefined, buyOrderResult: undefined, sellOrderResult: undefined });
                     return [2 /*return*/, [logResponse]];
                 }
                 return [2 /*return*/];
         }
     });
 }); };
+(function () { return __awaiter(void 0, void 0, void 0, function () {
+    var lastTitleTest;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (!(!process.env.key || !process.env.passphrase || !process.env.secret)) return [3 /*break*/, 1];
+                logger_1.logger.error('missing secret, passphrase or key. Exiting execution');
+                return [3 /*break*/, 3];
+            case 1: return [4 /*yield*/, exports.getBlogTitle()];
+            case 2:
+                lastTitleTest = _a.sent();
+                if (lastTitleTest == undefined)
+                    throw Error("didn't initialize title");
+                else {
+                    logger_1.logger.info("initalizing title");
+                    lastTitle = lastTitleTest;
+                    logger_1.logger.info("title set to " + lastTitle);
+                }
+                logger_1.logger.info('Launching coinbase monitoring cronjob');
+                exports.cronUpdate.start(); // launch the cron
+                _a.label = 3;
+            case 3: return [2 /*return*/];
+        }
+    });
+}); })();
 //# sourceMappingURL=check_rss.js.map

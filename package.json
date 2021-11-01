@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest ./dist/test/test.js",
-    "start": "node -r dotenv/config ./dist/check_rss_runner.js"
+    "start": "node -r dotenv/config ./dist/check_rss.js"
   },
   "repository": {
     "type": "git",

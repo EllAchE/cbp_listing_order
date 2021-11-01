@@ -54,7 +54,7 @@ var sellLogic = function (boughtTokenAmount, tradingPair) { return __awaiter(voi
                 */
                 sleep(180); // poor implementation of await, but setTimeout return type is weird
                 logger_1.logger.info("Waited for 180 seconds. Attempting to sell.");
-                return [4 /*yield*/, (0, api_interaction_1.placeMarketOrder)(false, boughtTokenAmount, tradingPair)];
+                return [4 /*yield*/, api_interaction_1.placeMarketOrder(false, boughtTokenAmount, tradingPair)];
             case 1: return [2 /*return*/, _a.sent()];
         }
     });

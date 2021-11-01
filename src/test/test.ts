@@ -1,8 +1,8 @@
-import { getBlogTitle } from "../check_rss"
-import { checkIfTitleIsAllListing, getTradingPairsFromTitle } from "../utils"
-
 require('jest')
 const assert = require('assert')
+
+import { getBlogTitle } from "../check_rss"
+import { checkIfTitleIsAllListing, getTradingPairsFromTitle } from "../utils"
 
 // todo add testing for multiple items being listed at the same time
 
