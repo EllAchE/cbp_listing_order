@@ -49,7 +49,7 @@ function initialPurchase(tradingPair, marketOrderAmount) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, api_interaction_1.placeMarketOrder(true, marketOrderAmount, tradingPair)];
+                case 0: return [4 /*yield*/, (0, api_interaction_1.placeMarketOrder)(true, marketOrderAmount, tradingPair)];
                 case 1: return [2 /*return*/, _a.sent()]; // naive implementation, immediate market order of specified amount
             }
         });
@@ -71,21 +71,21 @@ function executeTrades(tradingPairArray, lastTitle) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, listing_sell_logic_1.sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id)];
+                        return [4 /*yield*/, (0, listing_sell_logic_1.sellLogic)(buyOrderResult.executed_value, buyOrderResult.product_id)];
                     case 2:
                         sellOrderResult = _a.sent();
-                        logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
+                        logResponse = (0, utils_1.createBaseLoggingResponse)({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
                         logger_1.logger.info(logResponse);
                         return [2 /*return*/, logResponse];
                     case 3:
                         err_1 = _a.sent();
-                        return [2 /*return*/, utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: undefined, error: err_1 })];
+                        return [2 /*return*/, (0, utils_1.createBaseLoggingResponse)({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: undefined, error: err_1 })];
                     case 4: return [2 /*return*/];
                 }
             });
         }); })["catch"](function (err) {
             logger_1.logger.error('error with buy order', err);
-            return utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: undefined, sellOrderResult: undefined, error: err });
+            return (0, utils_1.createBaseLoggingResponse)({ title: lastTitle, buyOrderResult: undefined, sellOrderResult: undefined, error: err });
         }));
     });
     var returnArr = []; // this is done just to return a logging object

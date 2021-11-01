@@ -54,29 +54,29 @@ describe('Logging responses should work as expected', function () {
 });
 describe('Trading pair extraction from titles should work as expected', function () {
     it('Should get single listing from title', function () {
-        var tradingPairs = utils_1.getTradingPairsFromTitle(coinbaseTitleSingleListing);
+        var tradingPairs = (0, utils_1.getTradingPairsFromTitle)(coinbaseTitleSingleListing);
         expect(["USD-ASM"]).toEqual(tradingPairs);
     });
     it('Should get multiple listing from title', function () {
-        var tradingPairs = utils_1.getTradingPairsFromTitle(coinbaseTitleMultipleListing);
+        var tradingPairs = (0, utils_1.getTradingPairsFromTitle)(coinbaseTitleMultipleListing);
         expect(["USD-ARPA", "USD-PERP"]).toEqual(tradingPairs);
     });
     it('Should get no match from title without match', function () {
-        assert.equal(0, utils_1.getTradingPairsFromTitle(coinbaseTitleNoParenthesis));
-        assert.equal(0, utils_1.getTradingPairsFromTitle("").length);
+        assert.equal(0, (0, utils_1.getTradingPairsFromTitle)(coinbaseTitleNoParenthesis));
+        assert.equal(0, (0, utils_1.getTradingPairsFromTitle)("").length);
     });
 });
 describe('Should determine if title is an all listing', function () {
     it('Should match on title with singular listing', function () {
-        assert.equal(true, utils_1.checkIfTitleIsAllListing(coinbaseTitleSingleListing));
+        assert.equal(true, (0, utils_1.checkIfTitleIsAllListing)(coinbaseTitleSingleListing));
     });
     it('Should match on title with multiple listing', function () {
-        assert.equal(true, utils_1.checkIfTitleIsAllListing(coinbaseTitleMultipleListing));
+        assert.equal(true, (0, utils_1.checkIfTitleIsAllListing)(coinbaseTitleMultipleListing));
     });
     it('Should fail to match on title without listing', function () {
-        assert.equal(false, utils_1.checkIfTitleIsAllListing(coinbaseTitleProMultipleListing));
-        assert.equal(false, utils_1.checkIfTitleIsAllListing(coinbaseTitleProSingleListing));
-        assert.equal(false, utils_1.checkIfTitleIsAllListing(""));
+        assert.equal(false, (0, utils_1.checkIfTitleIsAllListing)(coinbaseTitleProMultipleListing));
+        assert.equal(false, (0, utils_1.checkIfTitleIsAllListing)(coinbaseTitleProSingleListing));
+        assert.equal(false, (0, utils_1.checkIfTitleIsAllListing)(""));
     });
 });
 describe('Should get latest blog title', function () {
@@ -84,7 +84,7 @@ describe('Should get latest blog title', function () {
         var title;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, check_rss_1.getBlogTitle()];
+                case 0: return [4 /*yield*/, (0, check_rss_1.getBlogTitle)()];
                 case 1:
                     title = _a.sent();
                     console.log(title);

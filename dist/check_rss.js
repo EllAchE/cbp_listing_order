@@ -44,7 +44,7 @@ var custom_methods_1 = require("./custom_methods");
 //const fs = require('fs');
 //const got = require('got');
 var rss = require('rss-parser');
-var cronString = "*/5 * 23,7-23 * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
+var cronString = "0 * * * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 var lastTitle;
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
     logger_1.logger.info("Coinbase listing cron executed at " + new Date().toLocaleString());
@@ -86,30 +86,30 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
     var title, logResponse, tradingPairArray, logResponse, logResponse;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, exports.getBlogTitle()];
+            case 0: return [4 /*yield*/, (0, exports.getBlogTitle)()];
             case 1:
                 title = _a.sent();
                 if (!title) {
                     logger_1.logger.error("errror retrieving title from feed results");
-                    logResponse = utils_1.createBaseLoggingResponse({ titleChanged: false, error: "error retrieving title from feed results", buyOrderResult: undefined, sellOrderResult: undefined });
+                    logResponse = (0, utils_1.createBaseLoggingResponse)({ titleChanged: false, error: "error retrieving title from feed results", buyOrderResult: undefined, sellOrderResult: undefined });
                     return [2 /*return*/, [logResponse]];
                 }
                 else if (title != lastTitle) { // execute orders here
                     lastTitle = title;
                     tradingPairArray = void 0;
-                    if (utils_1.checkIfTitleIsAllListing(title)) {
-                        tradingPairArray = utils_1.getTradingPairsFromTitle(title);
+                    if ((0, utils_1.checkIfTitleIsAllListing)(title)) {
+                        tradingPairArray = (0, utils_1.getTradingPairsFromTitle)(title);
                         logger_1.logger.info("retrieved trading pair from new title, value is " + tradingPairArray);
-                        return [2 /*return*/, custom_methods_1.executeTrades(tradingPairArray, lastTitle)];
+                        return [2 /*return*/, (0, custom_methods_1.executeTrades)(tradingPairArray, lastTitle)];
                     }
                     else {
                         logger_1.logger.info("regex didn't find a match on the title, or somehow returned null. Title was " + title);
-                        logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
+                        logResponse = (0, utils_1.createBaseLoggingResponse)({ title: lastTitle, error: "regex retrieval didn't find a match, or somehow returned null", buyOrderResult: undefined, sellOrderResult: undefined });
                         return [2 /*return*/, [logResponse]];
                     }
                 }
                 else { // can have more checks here if needed
-                    logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, titleChanged: false, error: undefined, buyOrderResult: undefined, sellOrderResult: undefined });
+                    logResponse = (0, utils_1.createBaseLoggingResponse)({ title: lastTitle, titleChanged: false, error: undefined, buyOrderResult: undefined, sellOrderResult: undefined });
                     return [2 /*return*/, [logResponse]];
                 }
                 return [2 /*return*/];
