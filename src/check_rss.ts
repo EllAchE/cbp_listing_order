@@ -1,6 +1,6 @@
 import { Feed, Item, LoggingResponse } from "./typing";
 import { CronJob } from 'cron';
-import { checkIfTitleIsAllListing, createBaseLoggingResponse, getTradingPairsFromTitle } from "./utils";
+import { checkIfTitleIsAllListing, createBaseLoggingResponse, getLastTitle, getTradingPairsFromTitle, initializeLastTitle, updateLastTitle } from "./utils";
 import { logger } from "./logger";
 import { executeTrades } from "./custom_methods";
 import * as Parser from "rss-parser";
@@ -8,7 +8,6 @@ import * as Parser from "rss-parser";
 //const fs = require('fs');
 //const got = require('got');
 const rss = require('rss-parser');
-var lastTitle: string;
 
 const cronString = `0 * * * * *`; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 
@@ -16,7 +15,7 @@ export const cronUpdate = new CronJob(cronString, function (): void {
     logger.info(`Coinbase listing cron executed at ${new Date().toLocaleString()}`);
     try {
         // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
-        checkFeed(lastTitle).then(logResponses => {
+        checkFeed().then(logResponses => {
             logResponses.forEach(logResponse => {
                 logger.info(JSON.stringify(logResponse));
             }
@@ -44,8 +43,9 @@ export const getBlogTitle = async (): Promise<string | undefined> => {
     }
 }
 
-const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
+const checkFeed = async (): Promise<LoggingResponse[]> => {
     const title = await getBlogTitle();
+    const lastTitle: string = getLastTitle();
 
     if (!title) {
         logger.error("errror retrieving title from feed results")
@@ -54,7 +54,7 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
     }
     else if (title != lastTitle) { // execute orders here
         logger.info(`title changed! It used to be ${lastTitle}, now it is ${title}`)
-        lastTitle = title;
+        updateLastTitle(title)
         let tradingPairArray: string[];
 
         if (checkIfTitleIsAllListing(title)) {
@@ -78,15 +78,11 @@ const checkFeed = async (lastTitle: string): Promise<LoggingResponse[]> => {
 (async () => {
     if (!process.env.key || !process.env.passphrase || !process.env.secret) logger.error('missing secret, passphrase or key. Exiting execution')
     else {
-        var lastTitleTest: string | undefined = await getBlogTitle();
-        if (lastTitleTest == undefined) throw Error("didn't initialize title")
-        else {
-            logger.info(`initalizing title`)
-            lastTitle = lastTitleTest;
-            logger.info(`title set to ${lastTitle}`)
-        }
-        logger.info('Launching coinbase monitoring cronjob')
-        cronUpdate.start() // launch the cron
+        logger.info(`initalizing title`)
+        await initializeLastTitle()
+        logger.info(`title set to ${getLastTitle()}`)
     }
+    logger.info('Launching coinbase monitoring cronjob')
+    cronUpdate.start() // launch the cron
 })();
 

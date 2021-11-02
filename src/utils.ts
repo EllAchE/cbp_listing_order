@@ -1,3 +1,4 @@
+import { getBlogTitle } from "./check_rss";
 import { logger } from "./logger";
 import { LoggingResponse } from "./typing";
 
@@ -41,3 +42,21 @@ export const checkIfTitleIsAllListing = (title: string): boolean => {
 }
 
 export const marketOrderAmount = '100' // must be a string for api methods
+
+let lastTitle: string;
+
+export const initializeLastTitle = async (): Promise<void> => {
+    const lastTitleTest = await getBlogTitle()
+    if (!lastTitleTest) throw Error("failed to intialize title")
+    else {
+        lastTitle = lastTitleTest
+    }
+}
+
+export const getLastTitle = (): string => {
+    return lastTitle;
+}
+
+export const updateLastTitle = (title: string): void => {
+    lastTitle = title;
+}

@@ -44,13 +44,12 @@ var custom_methods_1 = require("./custom_methods");
 //const fs = require('fs');
 //const got = require('got');
 var rss = require('rss-parser');
-var lastTitle;
 var cronString = "0 * * * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
     logger_1.logger.info("Coinbase listing cron executed at " + new Date().toLocaleString());
     try {
         // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
-        checkFeed(lastTitle).then(function (logResponses) {
+        checkFeed().then(function (logResponses) {
             logResponses.forEach(function (logResponse) {
                 logger_1.logger.info(JSON.stringify(logResponse));
             });
@@ -82,13 +81,14 @@ var getBlogTitle = function () { return __awaiter(void 0, void 0, void 0, functi
     });
 }); };
 exports.getBlogTitle = getBlogTitle;
-var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, function () {
-    var title, logResponse, tradingPairArray, logResponse, logResponse;
+var checkFeed = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var title, lastTitle, logResponse, tradingPairArray, logResponse, logResponse;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, exports.getBlogTitle()];
             case 1:
                 title = _a.sent();
+                lastTitle = utils_1.getLastTitle();
                 if (!title) {
                     logger_1.logger.error("errror retrieving title from feed results");
                     logResponse = utils_1.createBaseLoggingResponse({ titleChanged: false, error: "error retrieving title from feed results", buyOrderResult: undefined, sellOrderResult: undefined });
@@ -96,7 +96,7 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
                 }
                 else if (title != lastTitle) { // execute orders here
                     logger_1.logger.info("title changed! It used to be " + lastTitle + ", now it is " + title);
-                    lastTitle = title;
+                    utils_1.updateLastTitle(title);
                     tradingPairArray = void 0;
                     if (utils_1.checkIfTitleIsAllListing(title)) {
                         tradingPairArray = utils_1.getTradingPairsFromTitle(title);
@@ -118,27 +118,23 @@ var checkFeed = function (lastTitle) { return __awaiter(void 0, void 0, void 0, 
     });
 }); };
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var lastTitleTest;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 if (!(!process.env.key || !process.env.passphrase || !process.env.secret)) return [3 /*break*/, 1];
                 logger_1.logger.error('missing secret, passphrase or key. Exiting execution');
                 return [3 /*break*/, 3];
-            case 1: return [4 /*yield*/, exports.getBlogTitle()];
+            case 1:
+                logger_1.logger.info("initalizing title");
+                return [4 /*yield*/, utils_1.initializeLastTitle()];
             case 2:
-                lastTitleTest = _a.sent();
-                if (lastTitleTest == undefined)
-                    throw Error("didn't initialize title");
-                else {
-                    logger_1.logger.info("initalizing title");
-                    lastTitle = lastTitleTest;
-                    logger_1.logger.info("title set to " + lastTitle);
-                }
+                _a.sent();
+                logger_1.logger.info("title set to " + utils_1.getLastTitle());
+                _a.label = 3;
+            case 3:
                 logger_1.logger.info('Launching coinbase monitoring cronjob');
                 exports.cronUpdate.start(); // launch the cron
-                _a.label = 3;
-            case 3: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); })();
