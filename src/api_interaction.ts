@@ -1,20 +1,12 @@
-const cbp = require('coinbase-pro');
 import { BuySellPairs, OrderBook, BuyOrSellString, TradingPair } from "./typing";
-import { AuthenticatedClient, OrderParams, OrderResult } from "coinbase-pro";
+import { OrderParams, OrderResult } from "coinbase-pro";
 import { logger } from "./logger";
+import { getAuthedClient } from "./client";
 
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
 
-//const sandboxURI = 'https://api-public.sandbox.pro.coinbase.com';
-const apiURI = 'https://api.pro.coinbase.com';
 
-const authedClient: AuthenticatedClient = new cbp.AuthenticatedClient( // initialize your ordering client
-    process.env.key,
-    process.env.secret,
-    process.env.passphrase,
-    apiURI
-);
 
 const createLimitOrder = (price: string, amount: string, tradingPair: string, side: BuyOrSellString): OrderParams => { // same params for buy and sell
     return {
@@ -40,6 +32,8 @@ const createMarketOrder = (amount: string, tradingPair: string, side: BuyOrSellS
 }
 
 export const placeLimitOrder = async (isBuy: boolean, price: string, amount: string, tradingPair: string): Promise<OrderResult> => {
+    const authedClient = getAuthedClient()
+    logger.info(`authed client ${authedClient}`)
     logger.info(`attempting to place limit order with args isBuy ${isBuy}, price ${price}, amount ${amount}, tradingPair ${tradingPair}`)
     if (isBuy) {
         const orderParams = createLimitOrder(price, amount, tradingPair, BuyOrSellString.Buy)
@@ -52,6 +46,7 @@ export const placeLimitOrder = async (isBuy: boolean, price: string, amount: str
 }
 
 export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPair: string): Promise<OrderResult> => {
+    const authedClient = getAuthedClient()
     logger.info(`attempting to place market order with args isBuy ${isBuy}, amount ${amount}, tradingPair ${tradingPair}`)
     if (isBuy) {
         const orderParams = createMarketOrder(amount, tradingPair, BuyOrSellString.Buy)
@@ -64,21 +59,25 @@ export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPa
 }
 
 export const closePosition = async (productId: string): Promise<OrderResult> => {
+    const authedClient = getAuthedClient()
     return authedClient.closePosition({
         product_id: productId // this needs to be tested, the docs weren't clear
     })
 }
 
 export const cancelAllOrders = async (productId: string): Promise<string[]> => {
+    const authedClient = getAuthedClient()
     return authedClient.cancelAllOrders({ product_id: productId }); // returns a list of the ids of open orders that were successfully cancelled
 }
 
 export const cancelSingleOrder = async (orderId: string): Promise<string[]> => {
+    const authedClient = getAuthedClient()
     return authedClient.cancelOrder(orderId); // requires ID to cancel
 }
 
 // trading pair is a string like BTC-USD. Depth caps at 3 (unaggregated orders). 2 is aggregated, 1 is just best
 export const getOrderBook = async (tradingPair: string, depth: number): Promise<OrderBook> => {
+    const authedClient = getAuthedClient()
     return await authedClient.getProductOrderBook(tradingPair, { level: depth })
         .catch(err => {
             logger.error(err)
@@ -101,6 +100,7 @@ export const getBestCurrentPriceFromOrderBook = async (orderBook: OrderBook): Pr
 // need to determine which trading pairs are available
 export const getTradingPairs = async (baseCoin: string, quoteCoin: string): Promise<BuySellPairs> => {
     // getProducts returns the full list of trading pairs
+    const authedClient = getAuthedClient()
     const allPairs = await authedClient.getProducts()
         .catch(err => {
             logger.error(err)

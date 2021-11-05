@@ -41,6 +41,7 @@ var cron_1 = require("cron");
 var utils_1 = require("./utils");
 var logger_1 = require("./logger");
 var custom_methods_1 = require("./custom_methods");
+var client_1 = require("./client");
 var rss = require('rss-parser');
 var cronString = "0 * 23,7-23 * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
@@ -126,6 +127,7 @@ var checkFeed = function () { return __awaiter(void 0, void 0, void 0, function 
                 return [4 /*yield*/, utils_1.initializeLastTitle()];
             case 2:
                 _a.sent();
+                client_1.initaliazeAuthedClient();
                 logger_1.logger.info("title set to " + utils_1.getLastTitle());
                 _a.label = 3;
             case 3:

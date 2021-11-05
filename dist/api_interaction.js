@@ -37,15 +37,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.getTradingPairs = exports.getBestCurrentPriceFromOrderBook = exports.getOrderBook = exports.cancelSingleOrder = exports.cancelAllOrders = exports.closePosition = exports.placeMarketOrder = exports.placeLimitOrder = void 0;
-var cbp = require('coinbase-pro');
 var typing_1 = require("./typing");
 var logger_1 = require("./logger");
+var client_1 = require("./client");
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
-//const sandboxURI = 'https://api-public.sandbox.pro.coinbase.com';
-var apiURI = 'https://api.pro.coinbase.com';
-var authedClient = new cbp.AuthenticatedClient(// initialize your ordering client
-process.env.key, process.env.secret, process.env.passphrase, apiURI);
 var createLimitOrder = function (price, amount, tradingPair, side) {
     return {
         type: "limit",
@@ -67,8 +63,10 @@ var createMarketOrder = function (amount, tradingPair, side) {
     return orderParams;
 };
 var placeLimitOrder = function (isBuy, price, amount, tradingPair) { return __awaiter(void 0, void 0, void 0, function () {
-    var orderParams, orderParams;
+    var authedClient, orderParams, orderParams;
     return __generator(this, function (_a) {
+        authedClient = client_1.getAuthedClient();
+        logger_1.logger.info("authed client " + authedClient);
         logger_1.logger.info("attempting to place limit order with args isBuy " + isBuy + ", price " + price + ", amount " + amount + ", tradingPair " + tradingPair);
         if (isBuy) {
             orderParams = createLimitOrder(price, amount, tradingPair, typing_1.BuyOrSellString.Buy);
@@ -83,8 +81,9 @@ var placeLimitOrder = function (isBuy, price, amount, tradingPair) { return __aw
 }); };
 exports.placeLimitOrder = placeLimitOrder;
 var placeMarketOrder = function (isBuy, amount, tradingPair) { return __awaiter(void 0, void 0, void 0, function () {
-    var orderParams, orderParams;
+    var authedClient, orderParams, orderParams;
     return __generator(this, function (_a) {
+        authedClient = client_1.getAuthedClient();
         logger_1.logger.info("attempting to place market order with args isBuy " + isBuy + ", amount " + amount + ", tradingPair " + tradingPair);
         if (isBuy) {
             orderParams = createMarketOrder(amount, tradingPair, typing_1.BuyOrSellString.Buy);
@@ -99,7 +98,9 @@ var placeMarketOrder = function (isBuy, amount, tradingPair) { return __awaiter(
 }); };
 exports.placeMarketOrder = placeMarketOrder;
 var closePosition = function (productId) { return __awaiter(void 0, void 0, void 0, function () {
+    var authedClient;
     return __generator(this, function (_a) {
+        authedClient = client_1.getAuthedClient();
         return [2 /*return*/, authedClient.closePosition({
                 product_id: productId // this needs to be tested, the docs weren't clear
             })];
@@ -107,24 +108,31 @@ var closePosition = function (productId) { return __awaiter(void 0, void 0, void
 }); };
 exports.closePosition = closePosition;
 var cancelAllOrders = function (productId) { return __awaiter(void 0, void 0, void 0, function () {
+    var authedClient;
     return __generator(this, function (_a) {
+        authedClient = client_1.getAuthedClient();
         return [2 /*return*/, authedClient.cancelAllOrders({ product_id: productId })]; // returns a list of the ids of open orders that were successfully cancelled
     });
 }); };
 exports.cancelAllOrders = cancelAllOrders;
 var cancelSingleOrder = function (orderId) { return __awaiter(void 0, void 0, void 0, function () {
+    var authedClient;
     return __generator(this, function (_a) {
+        authedClient = client_1.getAuthedClient();
         return [2 /*return*/, authedClient.cancelOrder(orderId)]; // requires ID to cancel
     });
 }); };
 exports.cancelSingleOrder = cancelSingleOrder;
 // trading pair is a string like BTC-USD. Depth caps at 3 (unaggregated orders). 2 is aggregated, 1 is just best
 var getOrderBook = function (tradingPair, depth) { return __awaiter(void 0, void 0, void 0, function () {
+    var authedClient;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, authedClient.getProductOrderBook(tradingPair, { level: depth })["catch"](function (err) {
-                    logger_1.logger.error(err);
-                })];
+            case 0:
+                authedClient = client_1.getAuthedClient();
+                return [4 /*yield*/, authedClient.getProductOrderBook(tradingPair, { level: depth })["catch"](function (err) {
+                        logger_1.logger.error(err);
+                    })];
             case 1: return [2 /*return*/, _a.sent()];
         }
     });
@@ -145,12 +153,14 @@ exports.getBestCurrentPriceFromOrderBook = getBestCurrentPriceFromOrderBook;
 // }
 // need to determine which trading pairs are available
 var getTradingPairs = function (baseCoin, quoteCoin) { return __awaiter(void 0, void 0, void 0, function () {
-    var allPairs, sellPairs, buyPairs, buyPairsShort, sellPairsShort;
+    var authedClient, allPairs, sellPairs, buyPairs, buyPairsShort, sellPairsShort;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, authedClient.getProducts()["catch"](function (err) {
-                    logger_1.logger.error(err);
-                })];
+            case 0:
+                authedClient = client_1.getAuthedClient();
+                return [4 /*yield*/, authedClient.getProducts()["catch"](function (err) {
+                        logger_1.logger.error(err);
+                    })];
             case 1:
                 allPairs = _a.sent();
                 if (allPairs) {

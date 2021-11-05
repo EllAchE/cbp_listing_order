@@ -4,6 +4,7 @@ import { checkIfTitleIsAllListing, createBaseLoggingResponse, getLastTitle, getT
 import { logger } from "./logger";
 import { executeTrades } from "./custom_methods";
 import * as Parser from "rss-parser";
+import { initaliazeAuthedClient } from "./client";
 
 const rss = require('rss-parser');
 
@@ -76,6 +77,7 @@ const checkFeed = async (): Promise<LoggingResponse[]> => {
     else {
         logger.info(`initalizing title`)
         await initializeLastTitle()
+        initaliazeAuthedClient()
         logger.info(`title set to ${getLastTitle()}`)
     }
     logger.info('Launching coinbase monitoring cronjob')
