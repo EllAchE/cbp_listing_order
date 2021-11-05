@@ -65,7 +65,7 @@ var getTradingPairsFromTitle = function (titleString) {
 };
 exports.getTradingPairsFromTitle = getTradingPairsFromTitle;
 var checkIfTitleIsAllListing = function (title) {
-    var regPatternAll = new RegExp(/(is|are) (now available|launching) on Coinbase$/i); // for  4 different syntax cases item listing, and anchor at end to avoid cbp match
+    var regPatternAll = /(is|are) (now available|launching) on Coinbase$/i; // for  4 different syntax cases item listing, and anchor at end to avoid cbp match
     // const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/) // only runs for regular listings, can't buy on cbp when they list
     return regPatternAll.test(title);
 };
