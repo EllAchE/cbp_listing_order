@@ -8,6 +8,8 @@ import { checkIfTitleIsAllListing, getTradingPairsFromTitle } from "../utils"
 
 const coinbaseTitleSingleListing = "Assemble Protocol (ASM) is now available on Coinbase";
 const coinbaseTitleMultipleListing = "ARPA Chain (ARPA) and Perpetual Protocol (PERP) are now available on Coinbase";
+const coinbaseTitleMultipleListing2 = "Kryll (KRL), LCX (LCX) and OriginTrail (TRAC) are launching on Coinbase";
+const coinbaseTitleSingleListing2 = "Kryll (KRL) is launching on Coinbase";
 const coinbaseTitleProSingleListing = "Assemble Protocol (ASM) is launching on Coinbase Pro";
 const coinbaseTitleProMultipleListing = "ARPA Chain (ARPA), Bounce (AUCTION) and Perpetual Protocol (PERP) are launching on Coinbase Pro";
 const coinbaseTitleNoParenthesis = "ARPA Chain ARPA), Bounce (AUCTION and Perpetual Protocol ( PERP) are launching on Coinbase Pro";
@@ -31,6 +33,8 @@ describe('Trading pair extraction from titles should work as expected', () => {
     it('Should get multiple listing from title', () => {
         const tradingPairs = getTradingPairsFromTitle(coinbaseTitleMultipleListing);
         expect(["USD-ARPA", "USD-PERP"]).toEqual(tradingPairs);
+        const tradingPairs2 = getTradingPairsFromTitle(coinbaseTitleMultipleListing2);
+        expect(["USD-KRL", "USD-LCX", "USD-TRAC"]).toEqual(tradingPairs2);
     })
 
     it('Should get no match from title without match', () => {
@@ -42,10 +46,12 @@ describe('Trading pair extraction from titles should work as expected', () => {
 describe('Should determine if title is an all listing', () => {
     it('Should match on title with singular listing', () => {
         assert.equal(true, checkIfTitleIsAllListing(coinbaseTitleSingleListing))
+        assert.equal(true, checkIfTitleIsAllListing(coinbaseTitleSingleListing2))
     })
 
     it('Should match on title with multiple listing', () => {
         assert.equal(true, checkIfTitleIsAllListing(coinbaseTitleMultipleListing))
+        assert.equal(true, checkIfTitleIsAllListing(coinbaseTitleMultipleListing2))
     })
 
     it('Should fail to match on title without listing', () => {

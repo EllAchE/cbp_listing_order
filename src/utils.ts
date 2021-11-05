@@ -34,11 +34,10 @@ export const getTradingPairsFromTitle = (titleString: string): string[] => {
 }
 
 export const checkIfTitleIsAllListing = (title: string): boolean => {
-    const regPatternAllSingle = new RegExp(/(?<=\()(\w{1,10})(?=\) is now available on Coinbase)/i) // for singular item listing
-    const regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,10})(?=\) are now available on Coinbase)/i) // for multiple item listing
+    const regPatternAll = new RegExp(/(is|are) (now available|launching) on Coinbase$/i) // for  4 different syntax cases item listing, and anchor at end to avoid cbp match
     // const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/) // only runs for regular listings, can't buy on cbp when they list
 
-    return regPatternAllMultiple.test(title) || regPatternAllSingle.test(title)
+    return regPatternAll.test(title)
 }
 
 export const marketOrderAmount = '100' // must be a string for api methods

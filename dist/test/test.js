@@ -43,6 +43,8 @@ var utils_1 = require("../utils");
 // todo add testing for multiple items being listed at the same time
 var coinbaseTitleSingleListing = "Assemble Protocol (ASM) is now available on Coinbase";
 var coinbaseTitleMultipleListing = "ARPA Chain (ARPA) and Perpetual Protocol (PERP) are now available on Coinbase";
+var coinbaseTitleMultipleListing2 = "Kryll (KRL), LCX (LCX) and OriginTrail (TRAC) are launching on Coinbase";
+var coinbaseTitleSingleListing2 = "Kryll (KRL) is launching on Coinbase";
 var coinbaseTitleProSingleListing = "Assemble Protocol (ASM) is launching on Coinbase Pro";
 var coinbaseTitleProMultipleListing = "ARPA Chain (ARPA), Bounce (AUCTION) and Perpetual Protocol (PERP) are launching on Coinbase Pro";
 var coinbaseTitleNoParenthesis = "ARPA Chain ARPA), Bounce (AUCTION and Perpetual Protocol ( PERP) are launching on Coinbase Pro";
@@ -60,6 +62,8 @@ describe('Trading pair extraction from titles should work as expected', function
     it('Should get multiple listing from title', function () {
         var tradingPairs = utils_1.getTradingPairsFromTitle(coinbaseTitleMultipleListing);
         expect(["USD-ARPA", "USD-PERP"]).toEqual(tradingPairs);
+        var tradingPairs2 = utils_1.getTradingPairsFromTitle(coinbaseTitleMultipleListing2);
+        expect(["USD-KRL", "USD-LCX", "USD-TRAC"]).toEqual(tradingPairs2);
     });
     it('Should get no match from title without match', function () {
         assert.equal(0, utils_1.getTradingPairsFromTitle(coinbaseTitleNoParenthesis));
@@ -69,9 +73,11 @@ describe('Trading pair extraction from titles should work as expected', function
 describe('Should determine if title is an all listing', function () {
     it('Should match on title with singular listing', function () {
         assert.equal(true, utils_1.checkIfTitleIsAllListing(coinbaseTitleSingleListing));
+        assert.equal(true, utils_1.checkIfTitleIsAllListing(coinbaseTitleSingleListing2));
     });
     it('Should match on title with multiple listing', function () {
         assert.equal(true, utils_1.checkIfTitleIsAllListing(coinbaseTitleMultipleListing));
+        assert.equal(true, utils_1.checkIfTitleIsAllListing(coinbaseTitleMultipleListing2));
     });
     it('Should fail to match on title without listing', function () {
         assert.equal(false, utils_1.checkIfTitleIsAllListing(coinbaseTitleProMultipleListing));

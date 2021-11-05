@@ -65,10 +65,9 @@ var getTradingPairsFromTitle = function (titleString) {
 };
 exports.getTradingPairsFromTitle = getTradingPairsFromTitle;
 var checkIfTitleIsAllListing = function (title) {
-    var regPatternAllSingle = new RegExp(/(?<=\()(\w{1,10})(?=\) is now available on Coinbase)/i); // for singular item listing
-    var regPatternAllMultiple = new RegExp(/(?<=\()(\w{1,10})(?=\) are now available on Coinbase)/i); // for multiple item listing
+    var regPatternAll = new RegExp(/(is|are) (now available|launching) on Coinbase$/i); // for  4 different syntax cases item listing
     // const regPatternPro = new RegExp(/(?<=\()(\w{1,5})(?=\) is launching on Coinbase Pro)/) // only runs for regular listings, can't buy on cbp when they list
-    return regPatternAllMultiple.test(title) || regPatternAllSingle.test(title);
+    return regPatternAll.test(title);
 };
 exports.checkIfTitleIsAllListing = checkIfTitleIsAllListing;
 exports.marketOrderAmount = '100'; // must be a string for api methods
