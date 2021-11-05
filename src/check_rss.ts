@@ -5,16 +5,13 @@ import { logger } from "./logger";
 import { executeTrades } from "./custom_methods";
 import * as Parser from "rss-parser";
 
-//const fs = require('fs');
-//const got = require('got');
 const rss = require('rss-parser');
 
-const cronString = `0 * * * * *`; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
+const cronString = `0 * 23,7-23 * * *`; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 
 export const cronUpdate = new CronJob(cronString, function (): void {
     logger.info(`Coinbase listing cron executed at ${new Date().toLocaleString()}`);
     try {
-        // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
         checkFeed().then(logResponses => {
             logResponses.forEach(logResponse => {
                 logger.info(JSON.stringify(logResponse));
@@ -29,9 +26,8 @@ export const cronUpdate = new CronJob(cronString, function (): void {
 
 export const getBlogTitle = async (): Promise<string | undefined> => {
     try {
-        //const feedResponse = await got('https://blog.coinbase.com/feed');
         const parser: Parser<Feed, Item> = new rss();
-        const feed: Feed = await parser.parseURL('https://blog.coinbase.com/feed'); // this function is async
+        const feed: Feed = await parser.parseURL('https://blog.coinbase.com/feed');
         const title = feed.items[0].title;
 
         logger.info(`title parsed from rss feed ${title}`)

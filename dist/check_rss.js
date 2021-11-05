@@ -41,14 +41,11 @@ var cron_1 = require("cron");
 var utils_1 = require("./utils");
 var logger_1 = require("./logger");
 var custom_methods_1 = require("./custom_methods");
-//const fs = require('fs');
-//const got = require('got');
 var rss = require('rss-parser');
-var cronString = "0 * * * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
+var cronString = "0 * 23,7-23 * * *"; // run every minute, all hours except midnight-7am. Need to check TZ // also could probably ignore saturdays as possible listing date
 exports.cronUpdate = new cron_1.CronJob(cronString, function () {
     logger_1.logger.info("Coinbase listing cron executed at " + new Date().toLocaleString());
     try {
-        // const lastTitle = fs.readJsonSync('dist/json/last_title.json').title; save title if wanted
         checkFeed().then(function (logResponses) {
             logResponses.forEach(function (logResponse) {
                 logger_1.logger.info(JSON.stringify(logResponse));
