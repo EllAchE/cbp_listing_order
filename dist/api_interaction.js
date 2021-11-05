@@ -69,6 +69,7 @@ var createMarketOrder = function (amount, tradingPair, side) {
 var placeLimitOrder = function (isBuy, price, amount, tradingPair) { return __awaiter(void 0, void 0, void 0, function () {
     var orderParams, orderParams;
     return __generator(this, function (_a) {
+        logger_1.logger.info("attempting to place limit order with args isBuy " + isBuy + ", price " + price + ", amount " + amount + ", tradingPair " + tradingPair);
         if (isBuy) {
             orderParams = createLimitOrder(price, amount, tradingPair, typing_1.BuyOrSellString.Buy);
             return [2 /*return*/, authedClient.buy(orderParams)]; // returns a promise
