@@ -2,9 +2,9 @@
   "name": "cbp_listing_order",
   "version": "1.0.0",
   "description": "API Docs - https://docs.pro.coinbase.com/",
-  "main": "check_rss.js",
+  "main": "index.js",
   "scripts": {
-    "test": "jest ./dist/api_tests/test.js --setupFiles dotenv/config",
+    "test": "jest ./dist/test/test.js",
     "start": "node -r dotenv/config ./dist/check_rss.js"
   },
   "repository": {

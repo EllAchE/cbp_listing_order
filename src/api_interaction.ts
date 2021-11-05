@@ -1,5 +1,5 @@
 import { BuySellPairs, OrderBook, BuyOrSellString, TradingPair } from "./typing";
-import { OrderParams, OrderResult } from "coinbase-pro";
+import { MarketOrder, OrderParams, OrderResult } from "coinbase-pro";
 import { logger } from "./logger";
 import { getAuthedClient } from "./client";
 
@@ -19,10 +19,21 @@ const createLimitOrder = (price: string, amount: string, tradingPair: string, si
 }
 
 const createMarketOrder = (amount: string, tradingPair: string, side: BuyOrSellString): OrderParams => { // same params for buy and sell
-    const orderParams: OrderParams = {
+    let funds;
+    if (side == BuyOrSellString.Buy) {
+        funds = amount
+    }
+    else if (side == BuyOrSellString.Sell) {
+        funds = null
+    }
+    else {
+        throw Error("BuySellString issue")
+    }
+
+    const orderParams: MarketOrder = {
         type: "market",
         side: side,
-        funds: amount, // same as size
+        funds: funds, // Not required on sell. Limits spend https://docs.cloud.coinbase.com/exchange/reference/exchangerestapi_postorders
         size: amount, // amount of BTC to buy
         product_id: tradingPair, // first item is what's being bought, second item is what's being spent
     };

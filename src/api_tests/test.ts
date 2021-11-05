@@ -24,22 +24,18 @@ describe('should place limit sell order', () => {
     })
 })
 
-//export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPair: string): Promise<OrderResult> => {
-describe('should place market buy order', () => {
-    it('Should place market buy order', async () => {
-        const orderResult = await placeMarketOrder(true, "5", "ETH-USD") // place a market order to buy $5 of ETH at market price
-        expect(orderResult).toHaveProperty("id")
-        expect(orderResult.product_id).toBe("ETH-USD")
-        expect(orderResult.filled_size).toBe("0")
-    })
-})
+// //export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPair: string): Promise<OrderResult> => {
+describe('should place market buy order then sell equivalent amount', () => {
+    it('Should place market buy order then sell executed amount. Proxies sell logic without the 180s delay', async () => {
+        const buyOrderResult = await placeMarketOrder(true, "5", "ETH-USD") // place a market order to buy $5 of ETH at market price
+        expect(buyOrderResult).toHaveProperty("id")
+        expect(buyOrderResult.product_id).toBe("ETH-USD")
+        expect(buyOrderResult.size).toBe("5")
 
-describe('should place market sell order', () => {
-    it('Should place market sell order', async () => {
-        const orderResult = await placeMarketOrder(false, "5", "ETH-USD") // place a market order to sell $5 of ETH at market price 
-        expect(orderResult).toHaveProperty("id")
-        expect(orderResult.product_id).toBe("ETH-USD")
-        expect(orderResult.filled_size).toBe("0")
+        const sellOrderResult = await placeMarketOrder(false, "0.00029000", "ETH-USD") // place a market order to sell purchased amount ETH at market price. Some loss from fees
+        expect(sellOrderResult).toHaveProperty("id")
+        expect(sellOrderResult.product_id).toBe("ETH-USD")
+        expect(sellOrderResult.size).toBe("0.00029000")
     })
 })
 

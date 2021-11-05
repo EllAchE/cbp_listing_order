@@ -76,36 +76,26 @@ describe('should place limit sell order', function () {
         });
     }); });
 });
-//export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPair: string): Promise<OrderResult> => {
-describe('should place market buy order', function () {
-    it('Should place market buy order', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var orderResult;
+// //export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPair: string): Promise<OrderResult> => {
+describe('should place market buy order then sell equivalent amount', function () {
+    it('Should place market buy order then sell executed amount. Proxies sell logic without the 180s delay', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var buyOrderResult, sellOrderResult;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, api_interaction_1.placeMarketOrder(true, "5", "ETH-USD")]; // place a market order to buy $5 of ETH at market price
                 case 1:
-                    orderResult = _a.sent() // place a market order to buy $5 of ETH at market price
+                    buyOrderResult = _a.sent() // place a market order to buy $5 of ETH at market price
                     ;
-                    expect(orderResult).toHaveProperty("id");
-                    expect(orderResult.product_id).toBe("ETH-USD");
-                    expect(orderResult.filled_size).toBe("0");
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-});
-describe('should place market sell order', function () {
-    it('Should place market sell order', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var orderResult;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, api_interaction_1.placeMarketOrder(false, "5", "ETH-USD")]; // place a market order to sell $5 of ETH at market price 
-                case 1:
-                    orderResult = _a.sent() // place a market order to sell $5 of ETH at market price 
+                    expect(buyOrderResult).toHaveProperty("id");
+                    expect(buyOrderResult.product_id).toBe("ETH-USD");
+                    expect(buyOrderResult.size).toBe("5");
+                    return [4 /*yield*/, api_interaction_1.placeMarketOrder(false, "0.00029000", "ETH-USD")]; // place a market order to sell purchased amount ETH at market price. Some loss from fees
+                case 2:
+                    sellOrderResult = _a.sent() // place a market order to sell purchased amount ETH at market price. Some loss from fees
                     ;
-                    expect(orderResult).toHaveProperty("id");
-                    expect(orderResult.product_id).toBe("ETH-USD");
-                    expect(orderResult.filled_size).toBe("0");
+                    expect(sellOrderResult).toHaveProperty("id");
+                    expect(sellOrderResult.product_id).toBe("ETH-USD");
+                    expect(sellOrderResult.size).toBe("0.00029000");
                     return [2 /*return*/];
             }
         });

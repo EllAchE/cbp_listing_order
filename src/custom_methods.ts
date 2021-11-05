@@ -21,7 +21,8 @@ export function executeTrades(tradingPairArray: string[], lastTitle: string) {
         arr.push(initialPurchase(pair, marketOrderAmount).then(async (buyOrderResult) => { // Buy Orders/Purchases happen here
             logger.info(`received order result: ${buyOrderResult}`);
 
-            if (!buyOrderResult.settled) logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
+            // todo this needs better logic to wait if trade doesn't instantly settle
+            if (!buyOrderResult.settled) logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market), so expect an error.');
             try {
                 const sellOrderResult: OrderResult = await sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id); // sell orders happen here, async
                 const logResponse = createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });

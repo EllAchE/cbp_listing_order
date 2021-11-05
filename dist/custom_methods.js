@@ -66,8 +66,9 @@ function executeTrades(tradingPairArray, lastTitle) {
                 switch (_a.label) {
                     case 0:
                         logger_1.logger.info("received order result: " + buyOrderResult);
+                        // todo this needs better logic to wait if trade doesn't instantly settle
                         if (!buyOrderResult.settled)
-                            logger_1.logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market, so expect an error.');
+                            logger_1.logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market), so expect an error.');
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);

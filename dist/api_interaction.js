@@ -52,10 +52,20 @@ var createLimitOrder = function (price, amount, tradingPair, side) {
     };
 };
 var createMarketOrder = function (amount, tradingPair, side) {
+    var funds;
+    if (side == typing_1.BuyOrSellString.Buy) {
+        funds = amount;
+    }
+    else if (side == typing_1.BuyOrSellString.Sell) {
+        funds = null;
+    }
+    else {
+        throw Error("BuySellString issue");
+    }
     var orderParams = {
         type: "market",
         side: side,
-        funds: amount,
+        funds: funds,
         size: amount,
         product_id: tradingPair
     };
