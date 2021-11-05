@@ -32,7 +32,7 @@ const createMarketOrder = (amount: string, tradingPair: string, side: BuyOrSellS
 }
 
 export const placeLimitOrder = async (isBuy: boolean, price: string, amount: string, tradingPair: string): Promise<OrderResult> => {
-    const authedClient = getAuthedClient()
+    const authedClient = getAuthedClient();
     logger.info(`authed client ${authedClient}`)
     logger.info(`attempting to place limit order with args isBuy ${isBuy}, price ${price}, amount ${amount}, tradingPair ${tradingPair}`)
     if (isBuy) {

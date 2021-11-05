@@ -4,7 +4,7 @@
   "description": "API Docs - https://docs.pro.coinbase.com/",
   "main": "check_rss.js",
   "scripts": {
-    "test": "jest ./dist/api_tests/test.js",
+    "test": "jest ./dist/api_tests/test.js --setupFiles dotenv/config",
     "start": "node -r dotenv/config ./dist/check_rss.js"
   },
   "repository": {
