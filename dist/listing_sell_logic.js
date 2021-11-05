@@ -53,7 +53,7 @@ var sellLogic = function (buyOrderId, tradingPair) { return __awaiter(void 0, vo
                     Options are: Stop Limit, Limit, Market after time, constantly rising limit (trailing limit)
                 */
                 logger_1.logger.info("attempting to sell value of settled order, will first wait for 180 seconds");
-                sleep(180); // poor implementation of await, but setTimeout return type is weird
+                sleep(240); // poor implementation of await, but setTimeout return type is weird
                 return [4 /*yield*/, api_interaction_1.getPlacedOrder(buyOrderId)]; // order should have been placed if market and waiting for 3 minutes
             case 1:
                 orderResult = _a.sent() // order should have been placed if market and waiting for 3 minutes

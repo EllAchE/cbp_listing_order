@@ -1,6 +1,7 @@
 require('jest')
 import { placeLimitOrder, placeMarketOrder } from "../api_interaction";
 import { initaliazeAuthedClient } from "../client";
+import { sellLogic } from "../listing_sell_logic";
 
 initaliazeAuthedClient() // setup client before placing orders
 // For this test suite you should check that the open limit orders exist, and that the market orders were actually placed
@@ -39,3 +40,12 @@ describe('should place market buy order then sell equivalent amount', () => {
     })
 })
 
+describe('should properly execute sell logic based on the result of a settled order', () => {
+    it('should properly execute sell logic based on the result of a settled order', async () => {
+        const ethMarketSellOrderId = "31a99ecf-4a31-4784-9598-66efa64f6cfa";
+        const ethMarketPair = "ETH-USD";
+        const sellOrderResult = await sellLogic(ethMarketSellOrderId, ethMarketPair)
+        expect(sellOrderResult).toHaveProperty("id")
+        expect(sellOrderResult.product_id).toBe("ETH-USD")
+    })
+})

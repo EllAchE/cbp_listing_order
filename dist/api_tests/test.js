@@ -39,6 +39,7 @@ exports.__esModule = true;
 require('jest');
 var api_interaction_1 = require("../api_interaction");
 var client_1 = require("../client");
+var listing_sell_logic_1 = require("../listing_sell_logic");
 client_1.initaliazeAuthedClient(); // setup client before placing orders
 // For this test suite you should check that the open limit orders exist, and that the market orders were actually placed
 //export const placeLimitOrder = async (isBuy: boolean, price: string, amount: string, tradingPair: string): Promise<OrderResult> => {
@@ -96,6 +97,24 @@ describe('should place market buy order then sell equivalent amount', function (
                     expect(sellOrderResult).toHaveProperty("id");
                     expect(sellOrderResult.product_id).toBe("ETH-USD");
                     expect(sellOrderResult.size).toBe("0.00029000");
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe('should properly execute sell logic based on the result of a settled order', function () {
+    it('should properly execute sell logic based on the result of a settled order', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var ethMarketSellOrderId, ethMarketPair, sellOrderResult;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    ethMarketSellOrderId = "31a99ecf-4a31-4784-9598-66efa64f6cfa";
+                    ethMarketPair = "ETH-USD";
+                    return [4 /*yield*/, listing_sell_logic_1.sellLogic(ethMarketSellOrderId, ethMarketPair)];
+                case 1:
+                    sellOrderResult = _a.sent();
+                    expect(sellOrderResult).toHaveProperty("id");
+                    expect(sellOrderResult.product_id).toBe("ETH-USD");
                     return [2 /*return*/];
             }
         });
