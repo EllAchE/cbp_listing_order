@@ -72,7 +72,7 @@ function executeTrades(tradingPairArray, lastTitle) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, listing_sell_logic_1.sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id)];
+                        return [4 /*yield*/, listing_sell_logic_1.sellLogic(buyOrderResult.id, buyOrderResult.product_id)];
                     case 2:
                         sellOrderResult = _a.sent();
                         logResponse = utils_1.createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });

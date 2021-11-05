@@ -1,5 +1,5 @@
 import { BuySellPairs, OrderBook, BuyOrSellString, TradingPair } from "./typing";
-import { MarketOrder, OrderParams, OrderResult } from "coinbase-pro";
+import { MarketOrder, OrderInfo, OrderParams, OrderResult } from "coinbase-pro";
 import { logger } from "./logger";
 import { getAuthedClient } from "./client";
 
@@ -7,6 +7,14 @@ import { getAuthedClient } from "./client";
 // For now will be assuming USD but could convert to prioritize different pairs
 
 
+export const getPlacedOrder = async (orderId: string): Promise<OrderInfo> => {
+    const authedClient = getAuthedClient()
+    const orderResult = await authedClient.getOrder(orderId)
+    logger.info(`retrieving order details for order with id ${orderId}`)
+    logger.info(orderResult)
+
+    return orderResult;
+}
 
 const createLimitOrder = (price: string, amount: string, tradingPair: string, side: BuyOrSellString): OrderParams => { // same params for buy and sell
     return {

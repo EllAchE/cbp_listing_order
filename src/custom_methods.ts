@@ -24,7 +24,7 @@ export function executeTrades(tradingPairArray: string[], lastTitle: string) {
             // todo this needs better logic to wait if trade doesn't instantly settle
             if (!buyOrderResult.settled) logger.warn('trade hasn\'t settled, attempting to sell regardless (even though buy was a market), so expect an error.');
             try {
-                const sellOrderResult: OrderResult = await sellLogic(buyOrderResult.executed_value, buyOrderResult.product_id); // sell orders happen here, async
+                const sellOrderResult: OrderResult = await sellLogic(buyOrderResult.id, buyOrderResult.product_id); // sell orders happen here, async
                 const logResponse = createBaseLoggingResponse({ title: lastTitle, buyOrderResult: buyOrderResult, sellOrderResult: sellOrderResult, error: undefined });
                 logger.info(logResponse);
                 return logResponse;

@@ -36,12 +36,28 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.getTradingPairs = exports.getBestCurrentPriceFromOrderBook = exports.getOrderBook = exports.cancelSingleOrder = exports.cancelAllOrders = exports.closePosition = exports.placeMarketOrder = exports.placeLimitOrder = void 0;
+exports.getTradingPairs = exports.getBestCurrentPriceFromOrderBook = exports.getOrderBook = exports.cancelSingleOrder = exports.cancelAllOrders = exports.closePosition = exports.placeMarketOrder = exports.placeLimitOrder = exports.getPlacedOrder = void 0;
 var typing_1 = require("./typing");
 var logger_1 = require("./logger");
 var client_1 = require("./client");
 // Don't know of a case where USD won't work, but btc as backup. Rates seem essentially identical
 // For now will be assuming USD but could convert to prioritize different pairs
+var getPlacedOrder = function (orderId) { return __awaiter(void 0, void 0, void 0, function () {
+    var authedClient, orderResult;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                authedClient = client_1.getAuthedClient();
+                return [4 /*yield*/, authedClient.getOrder(orderId)];
+            case 1:
+                orderResult = _a.sent();
+                logger_1.logger.info("retrieving order details for order with id " + orderId);
+                logger_1.logger.info(orderResult);
+                return [2 /*return*/, orderResult];
+        }
+    });
+}); };
+exports.getPlacedOrder = getPlacedOrder;
 var createLimitOrder = function (price, amount, tradingPair, side) {
     return {
         type: "limit",
