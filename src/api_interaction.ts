@@ -48,11 +48,17 @@ export const placeLimitOrder = async (isBuy: boolean, price: string, amount: str
     logger.info(`attempting to place limit order with args isBuy ${isBuy}, price ${price}, amount ${amount}, tradingPair ${tradingPair}`)
     if (isBuy) {
         const orderParams = createLimitOrder(price, amount, tradingPair, BuyOrSellString.Buy)
-        return authedClient.buy(orderParams) // returns a promise
+        const orderResult = authedClient.buy(orderParams) // returns a promise
+        logger.info(`placed order`)
+        logger.info(orderResult)
+        return orderResult;
     }
     else {
         const orderParams = createLimitOrder(price, amount, tradingPair, BuyOrSellString.Sell)
-        return authedClient.sell(orderParams) // returns a promise
+        const orderResult = authedClient.sell(orderParams) // returns a promise
+        logger.info(`placed order`)
+        logger.info(orderResult)
+        return orderResult;
     }
 }
 
@@ -61,19 +67,28 @@ export const placeMarketOrder = async (isBuy: boolean, amount: string, tradingPa
     logger.info(`attempting to place market order with args isBuy ${isBuy}, amount ${amount}, tradingPair ${tradingPair}`)
     if (isBuy) {
         const orderParams = createMarketOrder(amount, tradingPair, BuyOrSellString.Buy)
-        return authedClient.buy(orderParams) // returns a promise
+        const orderResult = authedClient.buy(orderParams) // returns a promise
+        logger.info(`placed order`)
+        logger.info(orderResult)
+        return orderResult;
     }
     else {
         const orderParams = createMarketOrder(amount, tradingPair, BuyOrSellString.Sell)
-        return authedClient.sell(orderParams) // returns a promise
+        const orderResult = authedClient.sell(orderParams) // returns a promise
+        logger.info(`placed order`)
+        logger.info(orderResult)
+        return orderResult;
     }
 }
 
 export const closePosition = async (productId: string): Promise<OrderResult> => {
     const authedClient = getAuthedClient()
-    return authedClient.closePosition({
+    const orderResult = authedClient.closePosition({
         product_id: productId // this needs to be tested, the docs weren't clear
     })
+    logger.info(`placed order`)
+    logger.info(orderResult)
+    return orderResult;
 }
 
 export const cancelAllOrders = async (productId: string): Promise<string[]> => {

@@ -73,47 +73,66 @@ var createMarketOrder = function (amount, tradingPair, side) {
     return orderParams;
 };
 var placeLimitOrder = function (isBuy, price, amount, tradingPair) { return __awaiter(void 0, void 0, void 0, function () {
-    var authedClient, orderParams, orderParams;
+    var authedClient, orderParams, orderResult, orderParams, orderResult;
     return __generator(this, function (_a) {
         authedClient = client_1.getAuthedClient();
         logger_1.logger.info("authed client " + authedClient);
         logger_1.logger.info("attempting to place limit order with args isBuy " + isBuy + ", price " + price + ", amount " + amount + ", tradingPair " + tradingPair);
         if (isBuy) {
             orderParams = createLimitOrder(price, amount, tradingPair, typing_1.BuyOrSellString.Buy);
-            return [2 /*return*/, authedClient.buy(orderParams)]; // returns a promise
+            orderResult = authedClient.buy(orderParams) // returns a promise
+            ;
+            logger_1.logger.info("placed order");
+            logger_1.logger.info(orderResult);
+            return [2 /*return*/, orderResult];
         }
         else {
             orderParams = createLimitOrder(price, amount, tradingPair, typing_1.BuyOrSellString.Sell);
-            return [2 /*return*/, authedClient.sell(orderParams)]; // returns a promise
+            orderResult = authedClient.sell(orderParams) // returns a promise
+            ;
+            logger_1.logger.info("placed order");
+            logger_1.logger.info(orderResult);
+            return [2 /*return*/, orderResult];
         }
         return [2 /*return*/];
     });
 }); };
 exports.placeLimitOrder = placeLimitOrder;
 var placeMarketOrder = function (isBuy, amount, tradingPair) { return __awaiter(void 0, void 0, void 0, function () {
-    var authedClient, orderParams, orderParams;
+    var authedClient, orderParams, orderResult, orderParams, orderResult;
     return __generator(this, function (_a) {
         authedClient = client_1.getAuthedClient();
         logger_1.logger.info("attempting to place market order with args isBuy " + isBuy + ", amount " + amount + ", tradingPair " + tradingPair);
         if (isBuy) {
             orderParams = createMarketOrder(amount, tradingPair, typing_1.BuyOrSellString.Buy);
-            return [2 /*return*/, authedClient.buy(orderParams)]; // returns a promise
+            orderResult = authedClient.buy(orderParams) // returns a promise
+            ;
+            logger_1.logger.info("placed order");
+            logger_1.logger.info(orderResult);
+            return [2 /*return*/, orderResult];
         }
         else {
             orderParams = createMarketOrder(amount, tradingPair, typing_1.BuyOrSellString.Sell);
-            return [2 /*return*/, authedClient.sell(orderParams)]; // returns a promise
+            orderResult = authedClient.sell(orderParams) // returns a promise
+            ;
+            logger_1.logger.info("placed order");
+            logger_1.logger.info(orderResult);
+            return [2 /*return*/, orderResult];
         }
         return [2 /*return*/];
     });
 }); };
 exports.placeMarketOrder = placeMarketOrder;
 var closePosition = function (productId) { return __awaiter(void 0, void 0, void 0, function () {
-    var authedClient;
+    var authedClient, orderResult;
     return __generator(this, function (_a) {
         authedClient = client_1.getAuthedClient();
-        return [2 /*return*/, authedClient.closePosition({
-                product_id: productId // this needs to be tested, the docs weren't clear
-            })];
+        orderResult = authedClient.closePosition({
+            product_id: productId // this needs to be tested, the docs weren't clear
+        });
+        logger_1.logger.info("placed order");
+        logger_1.logger.info(orderResult);
+        return [2 /*return*/, orderResult];
     });
 }); };
 exports.closePosition = closePosition;
