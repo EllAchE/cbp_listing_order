@@ -13,9 +13,10 @@ API Docs - https://docs.pro.coinbase.com/
 1. Follow the steps defined in cbp docs/on the site to create a key, secret and passphrase for use in auth
 2. Create a file called .env and add the following values:
 
-key=your_api_key<br>
-secret=your_b64_secret<br>
-passphrase=your_passphrase<br>
+
+    key=your_api_key<br>
+    secret=your_b64_secret<br>
+    passphrase=your_passphrase<br>
 
 
 ### Outstanding work
