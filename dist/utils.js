@@ -70,7 +70,7 @@ var checkIfTitleIsAllListing = function (title) {
     return regPatternAll.test(title);
 };
 exports.checkIfTitleIsAllListing = checkIfTitleIsAllListing;
-exports.marketOrderAmount = '100'; // must be a string for api methods
+exports.marketOrderAmount = '1000'; // must be a string for api methods
 var lastTitle;
 var initializeLastTitle = function () { return __awaiter(void 0, void 0, void 0, function () {
     var lastTitleTest;

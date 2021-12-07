@@ -40,7 +40,7 @@ export const checkIfTitleIsAllListing = (title: string): boolean => {
     return regPatternAll.test(title)
 }
 
-export const marketOrderAmount = '100' // must be a string for api methods
+export const marketOrderAmount = '1000' // must be a string for api methods
 
 let lastTitle: string;
 
