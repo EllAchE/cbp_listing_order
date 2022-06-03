@@ -3,8 +3,6 @@
 Bot that listens to Coinbase Blog RSS feed and purchases newly listed (on standard coinbase, not coinbase pro) coins. Uses 
 coinbasepro-node library; Typescript/Node. When a new latest blog post is detected its title is parsed and new listings are extracted (assuming a specific title syntax pattern). Immediate market buy orders are placed, then all positions exited 3 minutes later (again via market order).
 
-*This is a naive implementation, this project has been paused.
-
 # Setup
 
 API Docs - https://docs.pro.coinbase.com/
@@ -24,3 +22,5 @@ API Docs - https://docs.pro.coinbase.com/
 - Add more nuanced sell logic (immediate limit)
 - Identify and do not purchase stablecoins/add a purchase blacklist
 - Support trading on alternate exchanges and use Pro listings as well
+
+*This is a naive implementation, this project has been paused.
